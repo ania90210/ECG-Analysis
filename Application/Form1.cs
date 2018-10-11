@@ -169,7 +169,7 @@ namespace Application
             QRSdetection();
 
             lowFilter = PanTompkins.Butterworth(amplitude, Fs, "LOW");
-
+            /*
             PressureChart1.Titles["Title1"].Text = "Low Filter";
             PressureChart1.Series["Pressure1"].ChartType = SeriesChartType.Spline;
             PressureChart1.Series["Pressure1"].Color = Color.Blue;
@@ -178,7 +178,7 @@ namespace Application
             for (int i = 0; i < 2000; i++)
             {
                 PressureChart1.Series["Pressure1"].Points.AddXY(time[i], lowFilter[i]);
-            }
+            }*/
 
             highFilter = PanTompkins.Butterworth(amplitude, Fs, "HIGH");
             highoriginal = PanTompkins.Butterworth(lowFilter, Fs, "HIGH");
@@ -191,14 +191,44 @@ namespace Application
             {
                 PressureChart2.Series["Pressure1"].Points.AddXY(time[i], highoriginal[i]);
             }
-
+/*
             PressureChart3.Titles["Title1"].Text = "Low Filter * High Filter(from original)";
             PressureChart3.Series["Pressure1"].ChartType = SeriesChartType.Spline;
             PressureChart3.Series["Pressure1"].Color = Color.Green;
             PressureChart3.ChartAreas[0].AxisX.Maximum = Math.Round(time[2000 - 1]);
+          
             for (int i = 0; i < 2000; i++)
             {
                 PressureChart3.Series["Pressure1"].Points.AddXY(time[i], lowFilter[i]* highFilter[i]);
+            }*/
+
+            // DERIVATIVE
+            double[] derivative = new double[40000];
+
+            for (int i = 0; i < 2000; i++)
+            {
+                derivative[i] = (highoriginal[i + 1] - highoriginal[i]) / (time[i + 1] - time[i]);
+            }
+
+            PressureChart1.Titles["Title1"].Text = "DERIVATIVE";
+            PressureChart1.Series["Pressure1"].ChartType = SeriesChartType.Spline;
+            PressureChart1.Series["Pressure1"].Color = Color.Blue;
+            PressureChart1.ChartAreas[0].AxisX.Maximum = Math.Round(time[2000 - 1]);
+
+            for (int i = 0; i < 2000; i++)
+            {
+                PressureChart1.Series["Pressure1"].Points.AddXY(time[i], derivative[i]);
+            }
+
+            // SQUARE
+            double[] square = new double[40000];
+            for (int i = 0; i < 2000; i++)
+            {
+                square[i] = derivative[i] * derivative[i];
+            }
+            for (int i = 0; i < 2000; i++)
+            {
+                PressureChart3.Series["Pressure1"].Points.AddXY(time[i], square[i]);
             }
         }
     }
