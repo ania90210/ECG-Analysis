@@ -167,7 +167,7 @@ namespace Application
         private void Start_Click(object sender, EventArgs e)
         {
             QRSdetection();
-            valueYp1 = Butterworth(amplitude, Fs, 20, "LOW");
+            valueYp1 = Butterworth(amplitude, Fs, "LOW");
 
             PressureChart1.Series["Pressure1"].ChartType = SeriesChartType.Spline;
             PressureChart1.Series["Pressure1"].Color = Color.Blue;
@@ -179,11 +179,10 @@ namespace Application
             }
         }
 
-        public static double[] Butterworth(double[] indata, double sampleRate, double frequency, string HL)
+        public static double[] Butterworth(double[] indata, double sampleRate, string HL)
         {
 
             if (indata == null) return null;
-            if (frequency == 0) return indata;
 
             long dF2 = indata.Length - 1;        // The data range is set with dF2
             double[] Dat2 = new double[dF2 + 4]; // Array with 4 extra points front and back // INPUT
@@ -198,7 +197,7 @@ namespace Application
             Dat2[dF2 + 3] = Dat2[dF2 + 2] = indata[dF2];
 
             //const double pi = 3.14159265358979;
-            double wc = Math.Tan(frequency * Math.PI / sampleRate);
+            double wc = Math.Tan(20 * Math.PI / sampleRate);
             double k1 = 1.414213562 * wc; // Sqrt(2) * wc
             double k2 = wc * wc;
             double a = k2 / (1 + k1 + k2);
@@ -209,7 +208,7 @@ namespace Application
             double e = 1 - (2 * a) - k3;
 
             // HIGH PASS
-            double cHIGH = Math.Tan(Math.PI * frequency / sampleRate);//
+            double cHIGH = Math.Tan(Math.PI * 20 / sampleRate);//
             double a1 = 1 / (1 + 1.414213562 * cHIGH + cHIGH * cHIGH);//
             double a2 = -2 * a1;
             double a3 = a1;
@@ -219,7 +218,10 @@ namespace Application
             // RECURSIVE TRIGGERS - ENABLE filter is performed (first, last points constant)
             double[] DatYt = new double[dF2 + 4]; //OUTPUT
             DatYt[1] = DatYt[0] = indata[0];
-            for (long s = 2; s < dF2 + 2; s++)
+
+            double[] DatYt2 = new double[dF2 + 4]; //OUTPUT
+            DatYt2[1] = DatYt2[0] = indata[0];
+            /*for (long s = 2; s < dF2 + 2; s++)
             {
                 if (HL == "LOW")
                 {
@@ -228,8 +230,8 @@ namespace Application
                 }
                 if (HL == "HIGH")
                 {
-                    DatYt[s] = a * Dat2[s] + b * Dat2[s - 1] + c * Dat2[s - 2]
-                               + d * DatYt[s - 1] + e * DatYt[s - 2];
+                    DatYt[s] = a1 * Dat2[s] + a2 * Dat2[s - 1] + a3 * Dat2[s - 2]
+                               + b1 * DatYt[s - 1] + b2 * DatYt[s - 2];
                 }
             }
             DatYt[dF2 + 3] = DatYt[dF2 + 2] = DatYt[dF2 + 1];
@@ -257,9 +259,43 @@ namespace Application
             {
                 data[p] = DatZt[p]; //Y
             }
+            */
+
+            // LOW FILTER
             
-            MessageBox.Show("dd: " + DatYt[400] + " hh: " + DatZt[0]); // NaN
-            return data;         
-        }
+                double cN = 1 / Math.Tan(Math.PI * 20 / sampleRate);
+                double a1N = 1.0 / (1.0 + 1.414213562 * cN + cN * cN);
+                double a2N = 2 * a1N;
+                double a3N = a1N;
+                double b1N = 2.0 * (1 - cN * cN) * a1N;
+                double b2N = (1.0 - 1.414213562 * cN + cN * cN) * a1N;
+
+                for (long n = 2; n < dF2 + 2; n++)
+                {
+                    DatYt[n] = a1N * Dat2[n] + a2N * Dat2[n - 1] + a3N * Dat2[n - 2] - b1N * DatYt[n - 1] - b2N * DatYt[n - 2];
+                }
+                MessageBox.Show("DAT2 " + Dat2.Length + "DATY" + DatYt.Length);
+            
+
+            //HIGH FILTER ??????????????
+                double cNH = Math.Tan(Math.PI * 5 / sampleRate);
+                double a1NH = 1.0 / (1.0 + 1.414213562 * cNH + cNH * cNH);
+                double a2NH = -2 * a1NH;
+                double a3NH = a1NH;
+                double b1NH = 2.0 * (cNH * cNH - 1) * a1NH;
+                double b2NH = (1.0 - 1.414213562 * cNH + cNH * cNH) * a1NH;
+                for (long n = 2; n < dF2 + 2; n++)
+                {
+                    DatYt[n] = a1NH * Dat2[n] + a2NH * Dat2[n - 1] + a3NH * Dat2[n - 2] - b1NH * DatYt[n - 1] - b2NH * DatYt[n - 2];
+                }
+                for (long p = 0; p < dF2; p++)
+                {
+                    data[p] = DatYt[p]; //Y
+                }
+            
+           // MessageBox.Show("DATY2: " + DatYt2.Length +"DAT2 "+ Dat2.Length + "DATY" + DatYt.Length); // NaN
+            return DatYt; 
+            
+        }        
     }
 }
