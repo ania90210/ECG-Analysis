@@ -10,7 +10,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
-using static Application.LowPassFilter;
 
 namespace Application
 {
@@ -21,7 +20,10 @@ namespace Application
         double Fs = 400;
         double[] valueY = new double[40000];
         double[] valueXp1 = new double[4000];
-        double[] valueYp1 = new double[0000];
+        double[] valueYp1 = new double[40000];
+        double[] lowFilter = new double[40000];
+        double[] highFilter = new double[40000];
+        double[] highoriginal = new double[40000];
         int counter;
 
         public Application()
@@ -56,9 +58,9 @@ namespace Application
             {
                 string[] lines = File.ReadAllLines(fileName);
                 counter = File.ReadLines(fileName).Count();
-                decimal decX, decY;
+                decimal decY;
 
-                for (int i = 0; i < 450; i++)
+                for (int i = 0; i < 2000; i++)
                 {                                      
                     Decimal.TryParse(lines[i], NumberStyles.Any, CultureInfo.InvariantCulture, out decY);                  
                     valueY[i] = decimal.ToDouble(decY);
@@ -100,14 +102,12 @@ namespace Application
                         series.Points.Clear(); // clear chart
                     }
                     chart.AxisX.Minimum = 0;
-                    chart.AxisX.Maximum = Math.Round(time[450 - 1]);
-                    //chart.AxisY.Minimum = -200;                
-                    //chart.AxisY.Maximum = 200;
+                    chart.AxisX.Maximum = Math.Round(time[2000 - 1]);
 
                     this.EKGchart.Series["EKG"].ChartType = SeriesChartType.Spline;
                     this.EKGchart.Series["EKG"].Color = Color.Red;
 
-                    for (int i = 0; i < 450; i++)
+                    for (int i = 0; i < 2000; i++)
                     {
                         this.EKGchart.Series["EKG"].Points.AddXY(time[i], amplitude[i]);
                     }
@@ -167,61 +167,44 @@ namespace Application
         private void Start_Click(object sender, EventArgs e)
         {
             QRSdetection();
-            valueYp1 = Butterworth(amplitude, Fs, "LOW");
 
+            lowFilter = PanTompkins.Butterworth(amplitude, Fs, "LOW");
+
+            PressureChart1.Titles["Title1"].Text = "Low Filter";
             PressureChart1.Series["Pressure1"].ChartType = SeriesChartType.Spline;
             PressureChart1.Series["Pressure1"].Color = Color.Blue;
-            PressureChart1.ChartAreas[0].AxisX.Maximum = Math.Round(time[450 - 1]);
+            PressureChart1.ChartAreas[0].AxisX.Maximum = Math.Round(time[2000 - 1]);
 
-            for (int i = 0; i < 450; i++)
+            for (int i = 0; i < 2000; i++)
             {
-                PressureChart1.Series["Pressure1"].Points.AddXY(time[i], valueYp1[i]);
+                PressureChart1.Series["Pressure1"].Points.AddXY(time[i], lowFilter[i]);
+            }
+
+            highFilter = PanTompkins.Butterworth(amplitude, Fs, "HIGH");
+            highoriginal = PanTompkins.Butterworth(lowFilter, Fs, "HIGH");
+
+            PressureChart2.Titles["Title1"].Text = "High Filter from Low Filter";
+            PressureChart2.Series["Pressure1"].ChartType = SeriesChartType.Spline;
+            PressureChart2.Series["Pressure1"].Color = Color.Brown;
+            PressureChart2.ChartAreas[0].AxisX.Maximum = Math.Round(time[2000 - 1]);
+            for (int i = 0; i < 2000; i++)
+            {
+                PressureChart2.Series["Pressure1"].Points.AddXY(time[i], highoriginal[i]);
+            }
+
+            PressureChart3.Titles["Title1"].Text = "Low Filter * High Filter(from original)";
+            PressureChart3.Series["Pressure1"].ChartType = SeriesChartType.Spline;
+            PressureChart3.Series["Pressure1"].Color = Color.Green;
+            PressureChart3.ChartAreas[0].AxisX.Maximum = Math.Round(time[2000 - 1]);
+            for (int i = 0; i < 2000; i++)
+            {
+                PressureChart3.Series["Pressure1"].Points.AddXY(time[i], lowFilter[i]* highFilter[i]);
             }
         }
-
-        public static double[] Butterworth(double[] indata, double sampleRate, string HL)
-        {
-
-            if (indata == null) return null;
-
-            long dF2 = indata.Length - 1;        // The data range is set with dF2
-            double[] Dat2 = new double[dF2 + 4]; // Array with 4 extra points front and back // INPUT
-            double[] data = indata; // Ptr., changes passed data
-
-            // Copy indata to Dat2
-            for (long r = 0; r < dF2; r++)
-            {
-                Dat2[2 + r] = indata[r];
-            }
-            Dat2[1] = Dat2[0] = indata[0];
-            Dat2[dF2 + 3] = Dat2[dF2 + 2] = indata[dF2];
-
-            //const double pi = 3.14159265358979;
-            double wc = Math.Tan(20 * Math.PI / sampleRate);
-            double k1 = 1.414213562 * wc; // Sqrt(2) * wc
-            double k2 = wc * wc;
-            double a = k2 / (1 + k1 + k2);
-            double b = 2 * a;
-            double c = a;
-            double k3 = b / k2;
-            double d = -2 * a + k3;
-            double e = 1 - (2 * a) - k3;
-
-            // HIGH PASS
-            double cHIGH = Math.Tan(Math.PI * 20 / sampleRate);//
-            double a1 = 1 / (1 + 1.414213562 * cHIGH + cHIGH * cHIGH);//
-            double a2 = -2 * a1;
-            double a3 = a1;
-            double b1 = 2 * (cHIGH * cHIGH - 1) * a1;
-            double b2 = (1 - 1.414213562 * cHIGH + cHIGH * cHIGH) * a1;
-
-            // RECURSIVE TRIGGERS - ENABLE filter is performed (first, last points constant)
-            double[] DatYt = new double[dF2 + 4]; //OUTPUT
-            DatYt[1] = DatYt[0] = indata[0];
-
-            double[] DatYt2 = new double[dF2 + 4]; //OUTPUT
-            DatYt2[1] = DatYt2[0] = indata[0];
-            /*for (long s = 2; s < dF2 + 2; s++)
+    }
+}
+/*
+for (long s = 2; s < dF2 + 2; s++)
             {
                 if (HL == "LOW")
                 {
@@ -260,42 +243,3 @@ namespace Application
                 data[p] = DatZt[p]; //Y
             }
             */
-
-            // LOW FILTER
-            
-                double cN = 1 / Math.Tan(Math.PI * 20 / sampleRate);
-                double a1N = 1.0 / (1.0 + 1.414213562 * cN + cN * cN);
-                double a2N = 2 * a1N;
-                double a3N = a1N;
-                double b1N = 2.0 * (1 - cN * cN) * a1N;
-                double b2N = (1.0 - 1.414213562 * cN + cN * cN) * a1N;
-
-                for (long n = 2; n < dF2 + 2; n++)
-                {
-                    DatYt[n] = a1N * Dat2[n] + a2N * Dat2[n - 1] + a3N * Dat2[n - 2] - b1N * DatYt[n - 1] - b2N * DatYt[n - 2];
-                }
-                MessageBox.Show("DAT2 " + Dat2.Length + "DATY" + DatYt.Length);
-            
-
-            //HIGH FILTER ??????????????
-                double cNH = Math.Tan(Math.PI * 5 / sampleRate);
-                double a1NH = 1.0 / (1.0 + 1.414213562 * cNH + cNH * cNH);
-                double a2NH = -2 * a1NH;
-                double a3NH = a1NH;
-                double b1NH = 2.0 * (cNH * cNH - 1) * a1NH;
-                double b2NH = (1.0 - 1.414213562 * cNH + cNH * cNH) * a1NH;
-                for (long n = 2; n < dF2 + 2; n++)
-                {
-                    DatYt[n] = a1NH * Dat2[n] + a2NH * Dat2[n - 1] + a3NH * Dat2[n - 2] - b1NH * DatYt[n - 1] - b2NH * DatYt[n - 2];
-                }
-                for (long p = 0; p < dF2; p++)
-                {
-                    data[p] = DatYt[p]; //Y
-                }
-            
-           // MessageBox.Show("DATY2: " + DatYt2.Length +"DAT2 "+ Dat2.Length + "DATY" + DatYt.Length); // NaN
-            return DatYt; 
-            
-        }        
-    }
-}
