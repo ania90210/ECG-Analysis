@@ -41,6 +41,9 @@ namespace Application
             System.Windows.Forms.DataVisualization.Charting.Title title3 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea6 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title4 = new System.Windows.Forms.DataVisualization.Charting.Title();
             this.EKGchart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.PressureChart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.OpenFileButton = new System.Windows.Forms.Button();
@@ -56,12 +59,14 @@ namespace Application
             this.ResultLabel = new System.Windows.Forms.Label();
             this.OknoLabel = new System.Windows.Forms.Label();
             this.Start = new System.Windows.Forms.Button();
+            this.chart4 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             ((System.ComponentModel.ISupportInitialize)(this.EKGchart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.PressureChart1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.PressureChart2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.PressureChart3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.PressureChart4)).BeginInit();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chart4)).BeginInit();
             this.SuspendLayout();
             // 
             // EKGchart
@@ -150,7 +155,7 @@ namespace Application
             this.PressureChart2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.PressureChart2.Name = "PressureChart2";
             series3.ChartArea = "ChartArea1";
-            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
             series3.CustomProperties = "IsXAxisQuantitative=False";
             series3.Legend = "Legend1";
             series3.Name = "Pressure1";
@@ -204,9 +209,9 @@ namespace Application
             this.panel1.Controls.Add(this.panel2);
             this.panel1.Controls.Add(this.ResultLabel);
             this.panel1.Controls.Add(this.OknoLabel);
-            this.panel1.Location = new System.Drawing.Point(952, 494);
+            this.panel1.Location = new System.Drawing.Point(971, 695);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(461, 320);
+            this.panel1.Size = new System.Drawing.Size(323, 107);
             this.panel1.TabIndex = 10;
             // 
             // HeartRateLabel
@@ -272,6 +277,23 @@ namespace Application
             this.Start.UseVisualStyleBackColor = false;
             this.Start.Click += new System.EventHandler(this.Start_Click);
             // 
+            // chart4
+            // 
+            this.chart4.BackColor = System.Drawing.Color.Lavender;
+            chartArea6.Name = "ChartArea1";
+            this.chart4.ChartAreas.Add(chartArea6);
+            this.chart4.Location = new System.Drawing.Point(796, 438);
+            this.chart4.Name = "chart4";
+            series6.ChartArea = "ChartArea1";
+            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series6.Name = "Series1";
+            this.chart4.Series.Add(series6);
+            this.chart4.Size = new System.Drawing.Size(679, 260);
+            this.chart4.TabIndex = 12;
+            this.chart4.Text = "chart1";
+            title4.Name = "Title1";
+            this.chart4.Titles.Add(title4);
+            // 
             // Application
             // 
             this.AllowDrop = true;
@@ -279,6 +301,7 @@ namespace Application
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(1521, 1040);
+            this.Controls.Add(this.chart4);
             this.Controls.Add(this.Start);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.PressureChart4);
@@ -302,6 +325,7 @@ namespace Application
             ((System.ComponentModel.ISupportInitialize)(this.PressureChart4)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.chart4)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -323,6 +347,7 @@ namespace Application
         private System.Windows.Forms.Button Start;
         private System.Windows.Forms.Label HeartRateLabel;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chart4;
     }
 }
 

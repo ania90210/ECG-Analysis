@@ -40,8 +40,8 @@ namespace Application
         private void OpenFileButton_Click_1(object sender, EventArgs e)
         {
             string fileName = null;
-
-                using (OpenFileDialog ofd = new OpenFileDialog())
+            //MessageBox.Show("brak wykresu Pressure1");
+            using (OpenFileDialog ofd = new OpenFileDialog())
             {
                 ofd.InitialDirectory = "C:\\Users\\Ania\\Desktop\\Inzynierka";
                 ofd.Filter = "Zwyk³y tekst (*.txt)|*.txt";
@@ -67,11 +67,11 @@ namespace Application
                     double Ts = 1 / Fs;
                     if (i == 0)
                     {
-                        amplitude[i] = valueY[i]/2;
+                        amplitude[i] = valueY[i]/100;
                         time[i] = Ts;
                     }
                     else {
-                        amplitude[i] = (valueY[i] + valueY[i - 1])/2;
+                        amplitude[i] = (valueY[i] + valueY[i - 1])/100;
                         time[i] = (i+1)*Ts;
                     }
                     
@@ -88,7 +88,7 @@ namespace Application
                 }
 
                 // do charts
-                //MessageBox.Show("time: "  + time.Length);
+               // MessageBox.Show("time: "  + time.Length + "time[i]" + time[3000]);
                 var chart = this.EKGchart.ChartAreas[0];                 
                 var chartP = PressureChart1.ChartAreas[0];
                 chartP.AxisX.Title = "Hz";
@@ -146,7 +146,7 @@ namespace Application
 
         private void label1_Click(object sender, EventArgs e)
         {
-
+            
         }
 
         private void QRSdetection()
@@ -183,14 +183,14 @@ namespace Application
             highFilter = PanTompkins.Butterworth(amplitude, Fs, "HIGH");
             highoriginal = PanTompkins.Butterworth(lowFilter, Fs, "HIGH");
 
-            PressureChart2.Titles["Title1"].Text = "High Filter from Low Filter";
+            /*PressureChart2.Titles["Title1"].Text = "High Filter from Low Filter";
             PressureChart2.Series["Pressure1"].ChartType = SeriesChartType.Spline;
             PressureChart2.Series["Pressure1"].Color = Color.Brown;
             PressureChart2.ChartAreas[0].AxisX.Maximum = Math.Round(time[2000 - 1]);
             for (int i = 0; i < 2000; i++)
             {
                 PressureChart2.Series["Pressure1"].Points.AddXY(time[i], highoriginal[i]);
-            }
+            }*/
 /*
             PressureChart3.Titles["Title1"].Text = "Low Filter * High Filter(from original)";
             PressureChart3.Series["Pressure1"].ChartType = SeriesChartType.Spline;
@@ -226,10 +226,82 @@ namespace Application
             {
                 square[i] = derivative[i] * derivative[i];
             }
+            PressureChart3.Titles["Title1"].Text = "SQUARE";
             for (int i = 0; i < 2000; i++)
             {
                 PressureChart3.Series["Pressure1"].Points.AddXY(time[i], square[i]);
             }
+
+            //MOVING AVERAGE FILTER
+            double[] average = new double[40000];           
+            for (int j = 59; j < 2000; j++)
+            {
+                double sum = 0;
+                for (int i = 0; i < 60; i++)
+                {
+                    sum += square[j - (60 - (i + 1))];
+                }
+
+                average[j-59] = sum / 60;                            
+            }
+
+            chart4.Titles["Title1"].Text = "MOVING AVERAGE FILTER";
+            chart4.Series["Series1"].ChartType = SeriesChartType.Spline;
+            chart4.Series["Series1"].Color = Color.DeepPink;
+            chart4.ChartAreas[0].AxisX.Maximum = Math.Round(time[2000 - 1]);
+            for (int i = 0; i < 2000; i++)
+            {
+                chart4.Series["Series1"].Points.AddXY(time[i], average[i]);
+            }
+
+            //PEAK
+            double[] first300 = new double[300];           
+            double[] rrrr = new double[300];
+            for (int i = 0; i < 300; i++)
+            {
+                first300[i] = average[i];
+            }
+            
+            double maxValue = first300.Max();
+            double SPK = 0.13 * maxValue;
+            double NPK = 0.1 * SPK;
+             double THRESHOLD = 0.25 * SPK + 0.75 * NPK;
+           // double THRESHOLD = 0.5* maxValue;
+
+            double[] QRS = new double[1000];
+            List<double> lst = new List<double>();
+            double[] first = new double[20000];
+
+            for (int i = 0; i < 2000; i++)
+            {
+                if (average[i] > THRESHOLD)
+                {
+                    first[i] = average[i];
+
+                    if(average[i + 1] < THRESHOLD)
+                    {
+                        lst.Add(first.Max());
+                        Array.Clear(first, 0, first.Length);
+                    }
+                }              
+            }
+
+            int number = lst.Count;
+            foreach(double K in lst)
+            {
+                for (int i = 0; i < 2000; i++)
+                {
+                    if(average[i] == K)
+                    {
+                        PressureChart2.Titles["Title1"].Text = "High Filter from Low Filter";
+            PressureChart2.Series["Pressure1"].Color = Color.Brown;
+            PressureChart2.ChartAreas[0].AxisX.Maximum = Math.Round(time[2000 - 1]);
+                        PressureChart2.Series["Pressure1"].Points.AddXY(time[i], average[i]);
+                    }
+                }
+            }
+                MessageBox.Show("THRESHOLD: " + THRESHOLD + "number: " + number);
+           
         }
     }
 }

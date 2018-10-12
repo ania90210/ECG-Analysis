@@ -35,7 +35,7 @@ namespace Application
             // LOW FILTER
             if (HL == "LOW")
             {
-                double cN = 1 / Math.Tan(Math.PI * 11 / sampleRate);
+                double cN = 1 / Math.Tan(Math.PI * 12 / sampleRate);
                 double a1N = 1.0 / (1.0 + Math.Sqrt(2) * cN + cN * cN);
                 double a2N = 2 * a1N;
                 double a3N = a1N;
