@@ -18,9 +18,10 @@ namespace Application
         double[] time = new double[40000];
         double[] amplitude = new double[40000];
         double Fs = 400;
-        int SamplesToAnalise = 4000;
+        int SamplesToAnalise = 8000;
+        int Window = 10;
         double[] valueY = new double[40000];
-        double[] valueXp1 = new double[4000];
+        double[] valueXp1 = new double[40000];
         double[] valueYp1 = new double[40000];
         int counter;
 
@@ -51,7 +52,7 @@ namespace Application
             }
 
             if (fileName != null) // if everything is OK
-            {
+            {                
                 string[] lines = File.ReadAllLines(fileName);
                 counter = File.ReadLines(fileName).Count();
                 decimal decY;
@@ -144,25 +145,15 @@ namespace Application
             
         }
 
-       /* private void QRSdetection()
-        {
-            int Rcounter = 0;
-
-            for (int i = 0; i < counter; i++)
-            {
-                if (valueY[i] > 0.65 && valueY[i-1] <= 0.65)
-                {   
-                        Rcounter++;                  
-                }
-            }
-            int HR = Rcounter * 6;
-            HeartRateLabel.Text = HR + " bpm";
-        }*/
-
         private void Start_Click(object sender, EventArgs e)
         {
             PanTompkins PanT = new PanTompkins();
-            PanT.PanTompkinsAlgorithm(amplitude, Fs, time, SamplesToAnalise, PressureChart1, PressureChart2, PressureChart3, chart4, HeartRateLabel);           
+            PanT.PanTompkinsAlgorithm(amplitude, Fs, time, SamplesToAnalise, PressureChart1, PressureChart2, PressureChart3, chart4, HeartRateLabel, Window);           
+        }
+
+        private void WindowLength_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            Window = int.Parse(WindowLength.SelectedItem.ToString());
         }
     } 
 }
