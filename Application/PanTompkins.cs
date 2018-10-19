@@ -87,7 +87,7 @@ namespace Application
         }
         
 
-        public void PanTompkinsAlgorithm(double[] indata, double sampleRate, double[] time, int SamplesToAnalise, Chart PressureChart1, Chart PressureChart2, Chart PressureChart3, Chart chart4, Label HeartRateLabel, int WindowLength)
+        public void PanTompkinsAlgorithm(double[] indata, double sampleRate, double[] time, int SamplesToAnalise, Chart PressureChart1, Chart PressureChart2, Chart PressureChart3, Chart chart4, Label HeartRateLabel, int WindowLength, ListView listView1)
         {
             double[] lowFilter = new double[40000];
             double[] highFilter = new double[40000];
@@ -109,7 +109,7 @@ namespace Application
             PressureChart1.Series["Pressure1"].ChartType = SeriesChartType.Spline;
             PressureChart1.Series["Pressure1"].Color = Color.Blue;
             PressureChart1.ChartAreas[0].AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
-
+            
             for (int i = 0; i < SamplesToAnalise; i++)
             {
                PressureChart1.Series["Pressure1"].Points.AddXY(time[i], derivative[i]);
@@ -149,7 +149,7 @@ namespace Application
                 chart4.Series["Series1"].Points.AddXY(time[i], average[i]);
             }
 
-            //PEAK
+            // FIRST PEAK
             double[] first300 = new double[300];
             for (int i = 0; i < 300; i++)
             {
@@ -162,64 +162,66 @@ namespace Application
             double THRESHOLD = 0.25 * SPK + 0.75 * NPK;
             // double THRESHOLD = 0.5* maxValue;
 
-            double[] QRS = new double[1000];
-            List<double> lst = new List<double>();
+            List<double> ListOfPeaks = new List<double>();
+            double[] AboveThreshold = new double[average.Length];
+            int FirstRTime = 0;
 
-            double[] first = new double[20000];
-            int firstT = 0;
-            for (int i = 0; i < SamplesToAnalise; i++)
+            for (int i = 0; i < 300; i++)
             {
                 if (average[i] == maxValue)
                 {
-                    firstT = i;
+                    FirstRTime = i;
                 }
             }
+            List<int> RTime = new List<int>();
+
             // DETECTION
-            for (int i = firstT; i < SamplesToAnalise; i++)
+            for (int i = FirstRTime; i < SamplesToAnalise; i++)
             {
                 if (average[i] > THRESHOLD)
                 {
-                    first[i] = average[i];
+                    AboveThreshold[i] = average[i];
                     if (average[i + 1] < THRESHOLD)
                     {
-                        lst.Add(first.Max());
-                        Array.Clear(first, 0, first.Length);
+                        RTime.Add(Array.FindIndex(AboveThreshold, w => w == AboveThreshold.Max()));
+                        ListOfPeaks.Add(AboveThreshold.Max());
+                        Array.Clear(AboveThreshold, 0, AboveThreshold.Length);
                     }
                 }
             }
-            int number = lst.Count;
+            int number = ListOfPeaks.Count;
             for (int i = 0; i < number - 1; i++)
             {
                 double firstTime = 0;
                 double secondTime = 0;
                 for (int j = 0; j < SamplesToAnalise; j++)
                 {
-                    if (average[j] == lst[i])
+                    if (average[j] == ListOfPeaks[i])
                     {
                         firstTime = time[j];
                     }
                 }
                 for (int j = 0; j < SamplesToAnalise; j++)
                 {
-                    if (average[j] == lst[i + 1])
+                    if (average[j] == ListOfPeaks[i + 1])
                     {
                         secondTime = time[j];
                     }
                 }
                 if ((secondTime - firstTime) < 0.343)
                 {
-                    if (lst[i + 1] < lst[i])
+                    if (ListOfPeaks[i + 1] < ListOfPeaks[i])
                     {
-                        lst[i + 1] = 0;
+                        ListOfPeaks[i + 1] = 0;
                     }
                     else
                     {
-                        lst[i] = 0;
+                        ListOfPeaks[i] = 0;
                     }
                 }
             }
 
-            foreach (double K in lst)
+            foreach (double K in ListOfPeaks)
             {
                 if (K != 0)
                 {
@@ -234,51 +236,32 @@ namespace Application
                         }
                     }
                 }
-               // MessageBox.Show("THRESHOLD: " + K + " number: " + number);
             }
-
             // HEART RATE
-            /* int notR = 0; ;
-             for (int i = 0; i < number - 1; i++)
-             {
-                 if (lst[i] == 0)
-                 {
-                     notR++;                 
-                 }
-             }
-             int R = number - notR;*/
-            int R = 0;
             int y = 0;
-            int t = 0;
             int x = 1;
-            for (; y < SamplesToAnalise; y=y+ WindowLength*400)
+            double numberOfWindows = (SamplesToAnalise / sampleRate) / WindowLength;
+            for (int i = 0; i < numberOfWindows; i++)
             {
-                HR(average, WindowLength, HeartRateLabel, R, number, lst, y, x, t);
-                x = x + 1;
-                t =  t+1;
-                //MessageBox.Show("x " + x);
-
+                HeartRate(WindowLength, RTime, sampleRate, x, y, listView1);
+                y++;
+                x++;
             }
-        }     
-        public void HR(double[] average, int WindowLength, Label HeartRateLabel, int R, int number, List<double> lst, int y, int x, int t)
+        }
+        public void HeartRate(int WindowLength, List<int> RTime, double sampleRate, int x, int y, ListView listView1)
         {
-           // MessageBox.Show("number " + number);
-            for (int i = 0; i < number; i++)
+            int R = 0;
+            foreach (double r in RTime)
             {
-                foreach (int b in average)
+                if (r > sampleRate * y * WindowLength && r < WindowLength * sampleRate * x)
                 {
-                    if (average[b] == lst[i])
-                    {
-                        R = R + 1;
-                        MessageBox.Show("average[b]: " + average[b]);
-                    }
+                    R++;
                 }
             }
-            MessageBox.Show("koniec petli po 24x" );
             double perMinute = 60 / WindowLength;
             double HeartRate = R * perMinute;
-            HeartRateLabel.Text = HeartRate + " bpm";
-           MessageBox.Show("R: " + R + " bmp: " + HeartRate);
+            var result = new ListViewItem(new[] { x.ToString(), HeartRate.ToString() + " bpm" });
+            listView1.Items.Add(result);
         }
     }
 }

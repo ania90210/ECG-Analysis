@@ -29,6 +29,8 @@ namespace Application
         {
             InitializeComponent();
             // empty chart
+            var header1 = listView1.Columns.Add("Window", -2, HorizontalAlignment.Left);
+            var header2 = listView1.Columns.Add("Heart Rate", -2, HorizontalAlignment.Center);
         }
 
         private void Application_Load(object sender, EventArgs e)
@@ -108,11 +110,6 @@ namespace Application
                         this.EKGchart.Series["EKG"].Points.AddXY(time[i], amplitude[i]);
                     }
                 }
-                else
-                {
-                    MessageBox.Show("brak wykresu");
-                    this.EKGchart.Series.Add("EKG");
-                }
 
                 // Pillow I chart
                 /*
@@ -148,7 +145,7 @@ namespace Application
         private void Start_Click(object sender, EventArgs e)
         {
             PanTompkins PanT = new PanTompkins();
-            PanT.PanTompkinsAlgorithm(amplitude, Fs, time, SamplesToAnalise, PressureChart1, PressureChart2, PressureChart3, chart4, HeartRateLabel, Window);           
+            PanT.PanTompkinsAlgorithm(amplitude, Fs, time, SamplesToAnalise, PressureChart1, PressureChart2, PressureChart3, chart4, HeartRateLabel, Window, listView1);           
         }
 
         private void WindowLength_SelectedIndexChanged(object sender, EventArgs e)
