@@ -61,7 +61,7 @@ namespace Application
             //HIGH FILTER 
             if (HL == "HIGH")
             {
-                double cNH = Math.Tan(Math.PI * 10 / sampleRate);
+                double cNH = Math.Tan(Math.PI * 7 / sampleRate);
                 double a1NH = 1.0 / (1.0 + Math.Sqrt(2) * cNH + cNH * cNH);
                 double a2NH = -2 * a1NH;
                 double a3NH = a1NH;
@@ -87,11 +87,11 @@ namespace Application
         }
         
 
-        public void PanTompkinsAlgorithm(double[] indata, double sampleRate, double[] time, int SamplesToAnalise, Chart PressureChart1, Chart PressureChart2, Chart PressureChart3, Chart chart4, Label HeartRateLabel, int WindowLength, ListView listView1)
+        public void PanTompkinsAlgorithm(double[] indata, double sampleRate, double[] time, int SamplesToAnalise, Chart PressureChart1, Chart PressureChart2, Chart PressureChart3, Chart chart4, Label HeartRateLabel, int WindowLength, ListView listView1, Timer timer1)
         {
-            double[] lowFilter = new double[40000];
-            double[] highFilter = new double[40000];
-            double[] highoriginal = new double[40000];
+            double[] lowFilter = new double[10000];
+            double[] highFilter = new double[10000];
+            double[] highoriginal = new double[10000];
 
             // FILTERING
             lowFilter = Butterworth(indata, sampleRate, "LOW");
@@ -99,13 +99,13 @@ namespace Application
             highoriginal = Butterworth(lowFilter, sampleRate, "HIGH");
 
             // DERIVATIVE
-            double[] derivative = new double[40000];
+            double[] derivative = new double[10000];
 
             for (int i = 0; i < SamplesToAnalise; i++)
             {
                 derivative[i] = (highoriginal[i + 1] - highoriginal[i]) / (time[i + 1] - time[i]);
             }
-            PressureChart1.Titles["Title1"].Text = "DERIVATIVE";
+           // PressureChart1.Titles["Title1"].Text = "DERIVATIVE";
             PressureChart1.Series["Pressure1"].ChartType = SeriesChartType.Spline;
             PressureChart1.Series["Pressure1"].Color = Color.Blue;
             PressureChart1.ChartAreas[0].AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
@@ -116,7 +116,7 @@ namespace Application
             }
 
             // SQUARING
-            double[] square = new double[40000];
+            double[] square = new double[10000];
             for (int i = 0; i < SamplesToAnalise; i++)
             {
                 square[i] = derivative[i] * derivative[i];
@@ -128,7 +128,7 @@ namespace Application
             }
 
             //MOVING AVERAGE FILTER
-            double[] average = new double[40000];
+            double[] average = new double[10000];
             for (int j = 99; j < SamplesToAnalise + 99; j++)
             {
                 double sum = 0;
@@ -160,7 +160,7 @@ namespace Application
             double SPK = 0.13 * maxValue;
             double NPK = 0.1 * SPK;
             double THRESHOLD = 0.25 * SPK + 0.75 * NPK;
-            // double THRESHOLD = 0.5* maxValue;
+           //  double THRESHOLD = 0.5* maxValue;
 
             List<double> ListOfPeaks = new List<double>();
             double[] AboveThreshold = new double[average.Length];
@@ -208,40 +208,40 @@ namespace Application
                         secondTime = time[j];
                     }
                 }
-                if ((secondTime - firstTime) < 0.343)
+                if ((secondTime - firstTime) < 0.45)//343
                 {
                     if (ListOfPeaks[i + 1] < ListOfPeaks[i])
                     {
                         ListOfPeaks[i + 1] = 0;
+                        RTime.RemoveAt(i+1);
                     }
                     else
                     {
                         ListOfPeaks[i] = 0;
+                        RTime.RemoveAt(i);
                     }
                 }
             }
-
             foreach (double K in ListOfPeaks)
-            {
-                if (K != 0)
-                {
-                    for (int i = 0; i < SamplesToAnalise; i++)
-                    {
-                        if (average[i] == K)
-                        {
-                            PressureChart2.Titles["Title1"].Text = "PEAK";
-                            PressureChart2.Series["Pressure1"].Color = Color.Brown;
-                            PressureChart2.ChartAreas[0].AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
-                            PressureChart2.Series["Pressure1"].Points.AddXY(time[i], average[i]);
-                        }
-                    }
-                }
+            {               
+                for (int i = 0; i < SamplesToAnalise; i++)
+               {
+                   if (average[i] == K)
+                   {
+                       PressureChart2.Titles["Title1"].Text = "PEAK";
+                       PressureChart2.ChartAreas[0].AxisX.Interval = 5;
+                       PressureChart2.Series["Pressure1"].Color = Color.Brown;
+                       PressureChart2.ChartAreas[0].AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
+                       PressureChart2.Series["Pressure1"].Points.AddXY(time[i], average[i]);
+                   }
+               }
             }
             // HEART RATE
             int y = 0;
             int x = 1;
             double numberOfWindows = (SamplesToAnalise / sampleRate) / WindowLength;
-            for (int i = 0; i < numberOfWindows; i++)
+            double RoundWindow = Math.Round(numberOfWindows);
+            for (int i = 0; i < RoundWindow; i++)
             {
                 HeartRate(WindowLength, RTime, sampleRate, x, y, listView1);
                 y++;
@@ -259,9 +259,13 @@ namespace Application
                 }
             }
             double perMinute = 60 / WindowLength;
-            double HeartRate = R * perMinute;
+            double HeartRate = R * perMinute;            
             var result = new ListViewItem(new[] { x.ToString(), HeartRate.ToString() + " bpm" });
+            Button btn = new Button();
+            btn.BackColor = SystemColors.ButtonFace;
             listView1.Items.Add(result);
+            listView1.Controls.Add(btn);
+          //  DataGridView;
         }
     }
 }

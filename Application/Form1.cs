@@ -15,22 +15,24 @@ namespace Application
 {
     public partial class Application : Form
     {
-        double[] time = new double[40000];
-        double[] amplitude = new double[40000];
-        double Fs = 400;
         int SamplesToAnalise = 8000;
+        double[] time = new double[10000];
+        double[] amplitude = new double[10000];
+        double Fs = 400;     
         int Window = 10;
-        double[] valueY = new double[40000];
-        double[] valueXp1 = new double[40000];
-        double[] valueYp1 = new double[40000];
+        StripLine stripline = new StripLine();
+        double[] valueY = new double[10000];
+        double[] valueXp1 = new double[10000];
+        double[] valueYp1 = new double[10000];
         int counter;
 
         public Application()
         {
             InitializeComponent();
             // empty chart
-            var header1 = listView1.Columns.Add("Window", -2, HorizontalAlignment.Left);
-            var header2 = listView1.Columns.Add("Heart Rate", -2, HorizontalAlignment.Center);
+            var header1 = listView1.Columns.Add("Nr okna", 100, HorizontalAlignment.Left);
+            var header2 = listView1.Columns.Add("Têtno", -2, HorizontalAlignment.Center);
+            listView1.BackColor = Color.White;
         }
 
         private void Application_Load(object sender, EventArgs e)
@@ -89,8 +91,8 @@ namespace Application
                 // do charts
                 var chart = this.EKGchart.ChartAreas[0];                 
                 var chartP = PressureChart1.ChartAreas[0];
-                chartP.AxisX.Title = "Hz";
-                chartP.AxisY.Title = "Pressure";
+                chart.AxisX.Title = "Time [s]";
+                chart.AxisY.Title = "Amplitude [mV]";
 
                 // EKG chart
                 if (this.EKGchart.Series.IndexOf("EKG") != -1) // if it exists
@@ -101,14 +103,14 @@ namespace Application
                     }
                     chart.AxisX.Minimum = 0;
                     chart.AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
+                    chart.AxisX.Interval = 5;
 
-                    this.EKGchart.Series["EKG"].ChartType = SeriesChartType.Spline;
                     this.EKGchart.Series["EKG"].Color = Color.Red;
 
                     for (int i = 0; i < SamplesToAnalise; i++)
                     {
                         this.EKGchart.Series["EKG"].Points.AddXY(time[i], amplitude[i]);
-                    }
+                    }                   
                 }
 
                 // Pillow I chart
@@ -136,7 +138,14 @@ namespace Application
             }
 
         }
-
+        public void StripLine(ChartArea chart, int x)
+        {         
+            stripline.Interval = x;
+            stripline.IntervalOffset = x;
+            stripline.StripWidth = 0.08;
+            stripline.BackColor = Color.Green;
+            chart.AxisX.StripLines.Add(stripline);
+        }
         private void label1_Click(object sender, EventArgs e)
         {
             
@@ -144,13 +153,19 @@ namespace Application
 
         private void Start_Click(object sender, EventArgs e)
         {
+            listView1.Items.Clear();
+            StripLine(this.EKGchart.ChartAreas[0], Window);
             PanTompkins PanT = new PanTompkins();
-            PanT.PanTompkinsAlgorithm(amplitude, Fs, time, SamplesToAnalise, PressureChart1, PressureChart2, PressureChart3, chart4, HeartRateLabel, Window, listView1);           
+            PanT.PanTompkinsAlgorithm(amplitude, Fs, time, SamplesToAnalise, PressureChart1, PressureChart2, PressureChart3, chart4, HeartRateLabel, Window, listView1, timer1);           
         }
 
         private void WindowLength_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Window = int.Parse(WindowLength.SelectedItem.ToString());
+            Window = int.Parse(WindowLength.SelectedItem.ToString());           
+        }
+
+        public void timer1_Tick(object sender, EventArgs e)
+        {
         }
     } 
 }
