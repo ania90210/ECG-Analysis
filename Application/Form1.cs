@@ -15,13 +15,14 @@ namespace Application
 {
     public partial class Application : Form
     {
-        int SamplesToAnalise = 8000;
-        double[] time = new double[10000];
-        double[] amplitude = new double[10000];
-        double Fs = 400;     
+        private bool buttonWasClicked = false;
+        static int SamplesToAnalise = 1000; //8000;
+        double[] time = new double[SamplesToAnalise + 5];
+        double[] amplitude = new double[SamplesToAnalise + 5];
+        double Fs = 100;//400;     
         int Window = 10;
         StripLine stripline = new StripLine();
-        double[] valueY = new double[10000];
+        double[] valueY = new double[SamplesToAnalise + 5];
         double[] valueXp1 = new double[10000];
         double[] valueYp1 = new double[10000];
         int counter;
@@ -30,9 +31,8 @@ namespace Application
         {
             InitializeComponent();
             // empty chart
-            var header1 = listView1.Columns.Add("Nr okna", 100, HorizontalAlignment.Left);
-            var header2 = listView1.Columns.Add("Têtno", -2, HorizontalAlignment.Center);
-            listView1.BackColor = Color.White;
+          //  var header1 = listView1.Columns.Add("Nr okna", 100, HorizontalAlignment.Left);
+            //var header2 = listView1.Columns.Add("Têtno", -2, HorizontalAlignment.Center);
         }
 
         private void Application_Load(object sender, EventArgs e)
@@ -41,6 +41,7 @@ namespace Application
 
         private void OpenFileButton_Click_1(object sender, EventArgs e)
         {
+            buttonWasClicked = true;
             string fileName = null;
             using (OpenFileDialog ofd = new OpenFileDialog())
             {
@@ -68,12 +69,16 @@ namespace Application
                     double Ts = 1 / Fs;
                     if (i == 0)
                     {
-                        amplitude[i] = valueY[i]/100;
-                        time[i] = Ts;
+                        /*  amplitude[i] = valueY[i]/100;
+                          time[i] = Ts;*/
+                        amplitude[i] = valueY[i];
+                          time[i] = 0;
                     }
                     else {
-                        amplitude[i] = (valueY[i] + valueY[i - 1])/100;
-                        time[i] = (i+1)*Ts;
+                        /* amplitude[i] = (valueY[i] + valueY[i - 1])/100;
+                         time[i] = (i+1)*Ts; */
+                        amplitude[i] = valueY[i];
+                        time[i] = i * Ts;
                     }
                     
                     /*string[] XY = lines[i].Split(',');
@@ -87,20 +92,15 @@ namespace Application
                     //valueXp1[i] = double.Parse(XY[2]);
                     //valueYp1[i] = double.Parse(XY[3]); 
                 }
-
                 // do charts
                 var chart = this.EKGchart.ChartAreas[0];                 
-                var chartP = PressureChart1.ChartAreas[0];
                 chart.AxisX.Title = "Time [s]";
                 chart.AxisY.Title = "Amplitude [mV]";
 
                 // EKG chart
                 if (this.EKGchart.Series.IndexOf("EKG") != -1) // if it exists
                 {
-                    foreach (var series in EKGchart.Series)
-                    {
-                        series.Points.Clear(); // clear chart
-                    }
+                    EKGchart.Series["EKG"].Points.Clear(); // clear chart
                     chart.AxisX.Minimum = 0;
                     chart.AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
                     chart.AxisX.Interval = 5;
@@ -110,62 +110,49 @@ namespace Application
                     for (int i = 0; i < SamplesToAnalise; i++)
                     {
                         this.EKGchart.Series["EKG"].Points.AddXY(time[i], amplitude[i]);
-                    }                   
-                }
-
-                // Pillow I chart
-                /*
-                if (PressureChart1.Series.IndexOf("Pressure1") != -1) //if exists
-                {
-                    foreach (var series in PressureChart1.Series)
-                    {
-                        series.Points.Clear(); // clear chart
                     }
-                    PressureChart1.Series["Pressure1"].ChartType = SeriesChartType.Spline;
-                    PressureChart1.Series["Pressure1"].Color = Color.Blue;
-
-                    for (int i = 0; i < counter; i++)
-                    {
-                        PressureChart1.Series["Pressure1"].Points.AddXY(valueXp1[i], valueYp1[i]);
-                    }
+                    listView1.Items.Clear();
+                    StripLine(this.EKGchart.ChartAreas[0], Window);
                 }
-                else
-                {
-                    MessageBox.Show("brak wykresu Pressure1");
-                    PressureChart1.Series.Add("Pressure1");//
-                }
-                */
             }
-
         }
         public void StripLine(ChartArea chart, int x)
         {         
             stripline.Interval = x;
-            stripline.IntervalOffset = x;
+            stripline.IntervalOffset = x - 0.04;
             stripline.StripWidth = 0.08;
-            stripline.BackColor = Color.Green;
+            stripline.BackColor = Color.MidnightBlue;
             chart.AxisX.StripLines.Add(stripline);
-        }
-        private void label1_Click(object sender, EventArgs e)
-        {
-            
         }
 
         private void Start_Click(object sender, EventArgs e)
         {
-            listView1.Items.Clear();
-            StripLine(this.EKGchart.ChartAreas[0], Window);
-            PanTompkins PanT = new PanTompkins();
-            PanT.PanTompkinsAlgorithm(amplitude, Fs, time, SamplesToAnalise, PressureChart1, PressureChart2, PressureChart3, chart4, HeartRateLabel, Window, listView1, timer1);           
+            if (buttonWasClicked == false)
+            {
+                MessageBox.Show("Najpierw wybierz folder");
+            }
+            if (Window > SamplesToAnalise / Fs)
+            {
+                MessageBox.Show("Wybrana wartoœæ okna czasowego jest nieprawid³owa");
+            }
+            if (buttonWasClicked && Window <= SamplesToAnalise / Fs)
+            {
+                StripLine(this.EKGchart.ChartAreas[0], Window);
+                PressureChart1.Series["Pressure1"].Points.Clear(); // clear chart
+                PressureChart2.Series["Pressure1"].Points.Clear();
+                PressureChart3.Series["Pressure1"].Points.Clear();
+                chart4.Series["Pressure1"].Points.Clear();
+                listView1.Items.Clear();
+
+                PanTompkins PanT = new PanTompkins();
+                PanT.PanTompkinsAlgorithm(amplitude, Fs, time, SamplesToAnalise, PressureChart1, PressureChart2, PressureChart3, chart4, Window, listView1);
+            }
         }
 
         private void WindowLength_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Window = int.Parse(WindowLength.SelectedItem.ToString());           
-        }
-
-        public void timer1_Tick(object sender, EventArgs e)
-        {
+            Window = int.Parse(WindowLength.SelectedItem.ToString());
+            StripLine(this.EKGchart.ChartAreas[0], Window);
         }
     } 
 }
@@ -196,3 +183,21 @@ namespace Application
                 data[p] = DatZt[p]; //Y
             }
             */
+/* Document pdfDoc = new Document(iTextSharp.text.PageSize.LETTER, 10, 10, 42, 35);
+PdfWriter.GetInstance(pdfDoc, new FileStream("Test.pdf", FileMode.Create));
+pdfDoc.Open();
+using (MemoryStream stream = new MemoryStream())
+{
+    chart.SaveImage(stream, ChartImageFormat.Png);
+    iTextSharp.text.Image chartImage = iTextSharp.text.Image.GetInstance(stream.GetBuffer());
+    chartImage.ScalePercent(200f);
+    pdfDoc.Add(chartImage);
+    pdfDoc.Close();
+
+    Response.Clear();
+    Response.AppendHeader("content-disposition", "attachment;filename=Chart.pdf");
+    Response.ContentType = "application/pdf";
+    Response.WriteFile(pdfDoc);
+    Response.Flush();
+    Response.End();
+}*/

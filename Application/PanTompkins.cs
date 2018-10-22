@@ -87,11 +87,11 @@ namespace Application
         }
         
 
-        public void PanTompkinsAlgorithm(double[] indata, double sampleRate, double[] time, int SamplesToAnalise, Chart PressureChart1, Chart PressureChart2, Chart PressureChart3, Chart chart4, Label HeartRateLabel, int WindowLength, ListView listView1, Timer timer1)
+        public void PanTompkinsAlgorithm(double[] indata, double sampleRate, double[] time, int SamplesToAnalise, Chart PressureChart1, Chart PressureChart2, Chart PressureChart3, Chart chart4, int WindowLength, ListView listView1)
         {
-            double[] lowFilter = new double[10000];
-            double[] highFilter = new double[10000];
-            double[] highoriginal = new double[10000];
+            double[] lowFilter = new double[SamplesToAnalise + 5];
+            double[] highFilter = new double[SamplesToAnalise + 5];
+            double[] highoriginal = new double[SamplesToAnalise + 5];
 
             // FILTERING
             lowFilter = Butterworth(indata, sampleRate, "LOW");
@@ -99,15 +99,16 @@ namespace Application
             highoriginal = Butterworth(lowFilter, sampleRate, "HIGH");
 
             // DERIVATIVE
-            double[] derivative = new double[10000];
+            double[] derivative = new double[SamplesToAnalise + 5];
 
             for (int i = 0; i < SamplesToAnalise; i++)
             {
                 derivative[i] = (highoriginal[i + 1] - highoriginal[i]) / (time[i + 1] - time[i]);
             }
-           // PressureChart1.Titles["Title1"].Text = "DERIVATIVE";
-            PressureChart1.Series["Pressure1"].ChartType = SeriesChartType.Spline;
+            PressureChart1.Titles["Title1"].Text = "DERIVATIVE";
             PressureChart1.Series["Pressure1"].Color = Color.Blue;
+            PressureChart1.ChartAreas[0].AxisX.Minimum = 0;
+            PressureChart1.ChartAreas[0].AxisX.Interval = 5;
             PressureChart1.ChartAreas[0].AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
             
             for (int i = 0; i < SamplesToAnalise; i++)
@@ -116,42 +117,46 @@ namespace Application
             }
 
             // SQUARING
-            double[] square = new double[10000];
+            double[] square = new double[SamplesToAnalise + 100];
             for (int i = 0; i < SamplesToAnalise; i++)
             {
                 square[i] = derivative[i] * derivative[i];
             }
-            PressureChart3.Titles["Title1"].Text = "SQUARE";
+            PressureChart2.Titles["Title1"].Text = "SQUARE";
+            PressureChart2.ChartAreas[0].AxisX.Minimum = 0;
+            PressureChart2.ChartAreas[0].AxisX.Interval = 5;
+            PressureChart2.ChartAreas[0].AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
             for (int i = 0; i < SamplesToAnalise; i++)
             {
-                PressureChart3.Series["Pressure1"].Points.AddXY(time[i], square[i]);
+                PressureChart2.Series["Pressure1"].Points.AddXY(time[i], square[i]);
             }
 
             //MOVING AVERAGE FILTER
-            double[] average = new double[10000];
-            for (int j = 99; j < SamplesToAnalise + 99; j++)
+            double[] average = new double[SamplesToAnalise + 5];
+            for (int j = 11; j < SamplesToAnalise + 11; j++) //99
             {
                 double sum = 0;
-                for (int i = 0; i < 100; i++)
+                for (int i = 0; i < 12; i++)
                 {
-                    sum += square[j - (100 - (i + 1))];
+                    sum += square[j - (12 - (i + 1))]; // 100
                 }
 
-                average[j - 99] = sum / 100;
+                average[j - 11] = sum / 12;
             }
 
-            chart4.Titles["Title1"].Text = "MOVING AVERAGE FILTER";
-            chart4.Series["Series1"].ChartType = SeriesChartType.Spline;
-            chart4.Series["Series1"].Color = Color.DeepPink;
-            chart4.ChartAreas[0].AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
+            PressureChart3.Titles["Title1"].Text = "MOVING AVERAGE FILTER";
+            PressureChart3.Series["Pressure1"].Color = Color.DeepPink;
+            PressureChart3.ChartAreas[0].AxisX.Minimum = 0;
+            PressureChart3.ChartAreas[0].AxisX.Interval = 5;
+            PressureChart3.ChartAreas[0].AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
             for (int i = 0; i < SamplesToAnalise; i++)
             {
-                chart4.Series["Series1"].Points.AddXY(time[i], average[i]);
+                PressureChart3.Series["Pressure1"].Points.AddXY(time[i], average[i]);
             }
 
             // FIRST PEAK
             double[] first300 = new double[300];
-            for (int i = 0; i < 300; i++)
+            for (int i = 0; i < 100; i++)   //300
             {
                 first300[i] = average[i];
             }
@@ -166,14 +171,14 @@ namespace Application
             double[] AboveThreshold = new double[average.Length];
             int FirstRTime = 0;
 
-            for (int i = 0; i < 300; i++)
+            for (int i = 0; i < 100; i++)
             {
                 if (average[i] == maxValue)
                 {
                     FirstRTime = i;
                 }
             }
-            List<int> RTime = new List<int>();
+            List<double> RTime = new List<double>();
 
             // DETECTION
             for (int i = FirstRTime; i < SamplesToAnalise; i++)
@@ -183,7 +188,9 @@ namespace Application
                     AboveThreshold[i] = average[i];
                     if (average[i + 1] < THRESHOLD)
                     {
-                        RTime.Add(Array.FindIndex(AboveThreshold, w => w == AboveThreshold.Max()));
+                        // RTime.Add(Array.FindIndex(AboveThreshold, w => w == AboveThreshold.Max()));
+                        int indx = (Array.FindIndex(AboveThreshold, w => w == AboveThreshold.Max()));
+                        RTime.Add(time[indx]);
                         ListOfPeaks.Add(AboveThreshold.Max());
                         Array.Clear(AboveThreshold, 0, AboveThreshold.Length);
                     }
@@ -192,7 +199,18 @@ namespace Application
             int number = ListOfPeaks.Count;
             for (int i = 0; i < number - 1; i++)
             {
-                double firstTime = 0;
+                if(RTime[i+1] - RTime[i] < 0.45)
+                {
+                    if (ListOfPeaks[i + 1] < ListOfPeaks[i])
+                    {
+                        ListOfPeaks[i + 1] = 0;
+                    }
+                    else
+                    {
+                        ListOfPeaks[i] = 0;
+                    }
+                }
+               /* double firstTime = 0;
                 double secondTime = 0;
                 for (int j = 0; j < SamplesToAnalise; j++)
                 {
@@ -213,26 +231,27 @@ namespace Application
                     if (ListOfPeaks[i + 1] < ListOfPeaks[i])
                     {
                         ListOfPeaks[i + 1] = 0;
-                        RTime.RemoveAt(i+1);
+                        RTime[i + 1] = 0;
                     }
                     else
                     {
                         ListOfPeaks[i] = 0;
-                        RTime.RemoveAt(i);
+                        RTime[i] = 0;
                     }
-                }
+                }*/
             }
             foreach (double K in ListOfPeaks)
-            {               
+            {
                 for (int i = 0; i < SamplesToAnalise; i++)
                {
                    if (average[i] == K)
                    {
-                       PressureChart2.Titles["Title1"].Text = "PEAK";
-                       PressureChart2.ChartAreas[0].AxisX.Interval = 5;
-                       PressureChart2.Series["Pressure1"].Color = Color.Brown;
-                       PressureChart2.ChartAreas[0].AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
-                       PressureChart2.Series["Pressure1"].Points.AddXY(time[i], average[i]);
+                        chart4.Titles["Title1"].Text = "PEAK";
+                        chart4.ChartAreas[0].AxisX.Minimum = 0;
+                        chart4.ChartAreas[0].AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
+                        chart4.ChartAreas[0].AxisX.Interval = 5;
+                        chart4.Series["Pressure1"].Color = Color.Brown;
+                        chart4.Series["Pressure1"].Points.AddXY(time[i], average[i]);
                    }
                }
             }
@@ -243,29 +262,34 @@ namespace Application
             double RoundWindow = Math.Round(numberOfWindows);
             for (int i = 0; i < RoundWindow; i++)
             {
-                HeartRate(WindowLength, RTime, sampleRate, x, y, listView1);
+                HeartRate(WindowLength, RTime, ListOfPeaks, sampleRate, x, y, listView1);
                 y++;
                 x++;
             }
         }
-        public void HeartRate(int WindowLength, List<int> RTime, double sampleRate, int x, int y, ListView listView1)
+        public void HeartRate(int WindowLength, List<double> RTime, List<double> ListOfPeaks, double sampleRate, int x, int y, ListView listView1)
         {
             int R = 0;
-            foreach (double r in RTime)
+            for(int i = 0; i < RTime.Count; i++)
+            {
+                if(RTime[i] > y * WindowLength && RTime[i] < x * WindowLength && ListOfPeaks[i] != 0)
+                {
+                    R++;
+                }
+            }
+           /* foreach (double r in RTime)
             {
                 if (r > sampleRate * y * WindowLength && r < WindowLength * sampleRate * x)
                 {
                     R++;
                 }
-            }
+            }*/
             double perMinute = 60 / WindowLength;
-            double HeartRate = R * perMinute;            
-            var result = new ListViewItem(new[] { x.ToString(), HeartRate.ToString() + " bpm" });
-            Button btn = new Button();
-            btn.BackColor = SystemColors.ButtonFace;
+            double HeartRate = R * perMinute;
+            string NrOkna = x + "  [" + y * WindowLength + " - " + x * WindowLength + "s]";
+            var result = new ListViewItem(new[] { NrOkna, HeartRate.ToString() + " bpm" });
             listView1.Items.Add(result);
-            listView1.Controls.Add(btn);
-          //  DataGridView;
+            result.ForeColor = (HeartRate > 59 && HeartRate < 91) ? Color.ForestGreen : Color.Red;
         }
     }
 }
