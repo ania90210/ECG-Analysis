@@ -11,6 +11,7 @@ namespace Application
 {
     public partial class PanTompkins : Form
     {
+       
         // LOW / HIGH PASS FILTER
         public static double[] Butterworth(double[] indata, double sampleRate, string HL)
         {
@@ -89,14 +90,21 @@ namespace Application
 
         public void PanTompkinsAlgorithm(double[] indata, double sampleRate, double[] time, int SamplesToAnalise, Chart PressureChart1, Chart PressureChart2, Chart PressureChart3, Chart chart4, int WindowLength, ListView listView1)
         {
-            double[] lowFilter = new double[SamplesToAnalise + 5];
-            double[] highFilter = new double[SamplesToAnalise + 5];
+            System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
+            double[] lowFilter = new double[SamplesToAnalise + 5];            
             double[] highoriginal = new double[SamplesToAnalise + 5];
-
+            
             // FILTERING
             lowFilter = Butterworth(indata, sampleRate, "LOW");
-            highFilter = Butterworth(indata, sampleRate, "HIGH");
+            watch.Stop();
+            Console.WriteLine($"Po low FILTER: Execution Time: {watch.ElapsedMilliseconds} ms");
+            if (!watch.IsRunning) // checks if it is not running
+                watch.Restart();
             highoriginal = Butterworth(lowFilter, sampleRate, "HIGH");
+            watch.Stop();
+            Console.WriteLine($"Po HIGH FILTER: Execution Time: {watch.ElapsedMilliseconds} ms");
+            if (!watch.IsRunning) // checks if it is not running
+                watch.Restart();
 
             // DERIVATIVE
             double[] derivative = new double[SamplesToAnalise + 5];
@@ -115,9 +123,12 @@ namespace Application
             {
                PressureChart1.Series["Pressure1"].Points.AddXY(time[i], derivative[i]);
             }
-
+            watch.Stop();
+            Console.WriteLine($"Po DERIVATIVE: Execution Time: {watch.ElapsedMilliseconds} ms");
+            if (!watch.IsRunning) // checks if it is not running
+                watch.Restart();
             // SQUARING
-            double[] square = new double[SamplesToAnalise + 100];
+            double[] square = new double[SamplesToAnalise + 200];
             for (int i = 0; i < SamplesToAnalise; i++)
             {
                 square[i] = derivative[i] * derivative[i];
@@ -130,18 +141,25 @@ namespace Application
             {
                 PressureChart2.Series["Pressure1"].Points.AddXY(time[i], square[i]);
             }
-
+            watch.Stop();
+            Console.WriteLine($"Po SQUERING: Execution Time: {watch.ElapsedMilliseconds} ms");
+            if (!watch.IsRunning) // checks if it is not running
+                watch.Restart();
             //MOVING AVERAGE FILTER
             double[] average = new double[SamplesToAnalise + 5];
-            for (int j = 11; j < SamplesToAnalise + 11; j++) //99
+            int movingAverageFilter = 0;
+            if (sampleRate == 100) movingAverageFilter = 12;
+            if (sampleRate == 400) movingAverageFilter = 100;
+            if (sampleRate == 4000) movingAverageFilter = 200;
+            for (int j = movingAverageFilter-1; j < SamplesToAnalise + movingAverageFilter -1; j++) //99//11
             {
                 double sum = 0;
-                for (int i = 0; i < 12; i++)
+                for (int i = 0; i < movingAverageFilter; i++)
                 {
-                    sum += square[j - (12 - (i + 1))]; // 100
+                    sum += square[j - (movingAverageFilter - (i + 1))]; // 100
                 }
 
-                average[j - 11] = sum / 12;
+                average[j - (movingAverageFilter - 1)] = sum / movingAverageFilter;
             }
 
             PressureChart3.Titles["Title1"].Text = "MOVING AVERAGE FILTER";
@@ -153,53 +171,73 @@ namespace Application
             {
                 PressureChart3.Series["Pressure1"].Points.AddXY(time[i], average[i]);
             }
-
+            watch.Stop();
+            Console.WriteLine($"Po MOVING AVERAGE FILTER: Execution Time: {watch.ElapsedMilliseconds} ms");
+            if (!watch.IsRunning) // checks if it is not running
+                watch.Restart();
             // FIRST PEAK
-            double[] first300 = new double[300];
-            for (int i = 0; i < 100; i++)   //300
+            int Samples = 0;
+            if (sampleRate == 100) Samples = 100;
+            if (sampleRate == 400) Samples = 300;
+            if (sampleRate == 4000) Samples = 3000;
+            double[] firstSamples = new double[Samples];
+            for (int i = 0; i < Samples; i++)   
             {
-                first300[i] = average[i];
+                firstSamples[i] = average[i];
             }
 
-            double maxValue = first300.Max();
+            double maxValue = firstSamples.Max();
             double SPK = 0.13 * maxValue;
             double NPK = 0.1 * SPK;
             double THRESHOLD = 0.25 * SPK + 0.75 * NPK;
            //  double THRESHOLD = 0.5* maxValue;
 
-            List<double> ListOfPeaks = new List<double>();
-            double[] AboveThreshold = new double[average.Length];
-            int FirstRTime = 0;
-
-            for (int i = 0; i < 100; i++)
-            {
-                if (average[i] == maxValue)
-                {
-                    FirstRTime = i;
-                }
-            }
+            List<double> ListOfPeaks = new List<double>();            
             List<double> RTime = new List<double>();
-
+            List<double> AboveAverage = new List<double>();
+            List<double> TimeAverage = new List<double>();
+            double[] AboveThreshold = new double[average.Length];
+            List<double> difference = new List<double>();
             // DETECTION
-            for (int i = FirstRTime; i < SamplesToAnalise; i++)
+            for (int i = 0; i < SamplesToAnalise; i++) // od FirstRTime = Array.FindIndex(firstSamples, w => w == maxValue);
             {
                 if (average[i] > THRESHOLD)
                 {
-                    AboveThreshold[i] = average[i];
+                    AboveAverage.Add(average[i]);
+                    TimeAverage.Add(time[i]);
+                    // AboveThreshold[i] = average[i];
                     if (average[i + 1] < THRESHOLD)
                     {
+                        double max = AboveAverage.Max(); // R peak
+                        int index = AboveAverage.FindIndex(w => w == max); // index of R peak == index of Time of this peak
+                        double start = TimeAverage.First();
+                        double end = TimeAverage.Last();
+                        if (end - start > 0.8)
+                        {
+                            difference.Add(start);
+                            // sprawdz poduszki
+                        }
+
+                        RTime.Add(TimeAverage[index]);
+                        ListOfPeaks.Add(max);
+                        AboveAverage.Clear();
+                        TimeAverage.Clear();
+
+                        /*
                         // RTime.Add(Array.FindIndex(AboveThreshold, w => w == AboveThreshold.Max()));
                         int indx = (Array.FindIndex(AboveThreshold, w => w == AboveThreshold.Max()));
                         RTime.Add(time[indx]);
                         ListOfPeaks.Add(AboveThreshold.Max());
                         Array.Clear(AboveThreshold, 0, AboveThreshold.Length);
+                        */
                     }
                 }
             }
+            
             int number = ListOfPeaks.Count;
             for (int i = 0; i < number - 1; i++)
             {
-                if(RTime[i+1] - RTime[i] < 0.45)
+                if(RTime[i+1] - RTime[i] < 0.49)
                 {
                     if (ListOfPeaks[i + 1] < ListOfPeaks[i])
                     {
@@ -240,6 +278,10 @@ namespace Application
                     }
                 }*/
             }
+            watch.Stop();
+            Console.WriteLine($"Po DETEKCJI PEAKOW: Execution Time: {watch.ElapsedMilliseconds} ms");
+            if (!watch.IsRunning) // checks if it is not running
+                watch.Restart();
             foreach (double K in ListOfPeaks)
             {
                 for (int i = 0; i < SamplesToAnalise; i++)
@@ -251,8 +293,8 @@ namespace Application
                         chart4.ChartAreas[0].AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
                         chart4.ChartAreas[0].AxisX.Interval = 5;
                         chart4.Series["Pressure1"].Color = Color.Brown;
-                        chart4.Series["Pressure1"].Points.AddXY(time[i], average[i]);
-                   }
+                        chart4.Series["Pressure1"].Points.AddXY(time[i], K); //AboveThreshold[i]
+                    }
                }
             }
             // HEART RATE
@@ -262,17 +304,29 @@ namespace Application
             double RoundWindow = Math.Round(numberOfWindows);
             for (int i = 0; i < RoundWindow; i++)
             {
-                HeartRate(WindowLength, RTime, ListOfPeaks, sampleRate, x, y, listView1);
+                HeartRate(WindowLength, RTime, ListOfPeaks, sampleRate, x, y, listView1, difference);
                 y++;
                 x++;
             }
+            watch.Stop();
+            Console.WriteLine($"Po HEART RATE: Execution Time: {watch.ElapsedMilliseconds} ms");
+            if (!watch.IsRunning) // checks if it is not running
+                watch.Restart();
         }
-        public void HeartRate(int WindowLength, List<double> RTime, List<double> ListOfPeaks, double sampleRate, int x, int y, ListView listView1)
+        public void HeartRate(int WindowLength, List<double> RTime, List<double> ListOfPeaks, double sampleRate, int x, int y, ListView listView1, List<double> difference)
         {
             int R = 0;
-            for(int i = 0; i < RTime.Count; i++)
+            string zle = "dobrze";
+            for(int i = 0; i < difference.Count; i++)
             {
-                if(RTime[i] > y * WindowLength && RTime[i] < x * WindowLength && ListOfPeaks[i] != 0)
+                if (difference.Count != 0 && difference[i] >= y * WindowLength && difference[i] < x * WindowLength)
+                {
+                    zle = "sprawdz poduszki";
+                }
+            }
+            for(int i = 0; i < RTime.Count; i++)
+            {               
+                if (RTime[i] > y * WindowLength && RTime[i] < x * WindowLength && ListOfPeaks[i] != 0)
                 {
                     R++;
                 }
@@ -287,7 +341,7 @@ namespace Application
             double perMinute = 60 / WindowLength;
             double HeartRate = R * perMinute;
             string NrOkna = x + "  [" + y * WindowLength + " - " + x * WindowLength + "s]";
-            var result = new ListViewItem(new[] { NrOkna, HeartRate.ToString() + " bpm" });
+            var result = new ListViewItem(new[] { NrOkna, HeartRate.ToString() + " bpm", zle });
             listView1.Items.Add(result);
             result.ForeColor = (HeartRate > 59 && HeartRate < 91) ? Color.ForestGreen : Color.Red;
         }

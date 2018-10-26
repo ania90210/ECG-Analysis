@@ -16,10 +16,10 @@ namespace Application
     public partial class Application : Form
     {
         private bool buttonWasClicked = false;
-        static int SamplesToAnalise = 1000; //8000;
+        static int SamplesToAnalise = 1000; //1000 //8000/ 20000;
         double[] time = new double[SamplesToAnalise + 5];
         double[] amplitude = new double[SamplesToAnalise + 5];
-        double Fs = 100;//400;     
+        double Fs = 100;//100//400//4000;     
         int Window = 10;
         StripLine stripline = new StripLine();
         double[] valueY = new double[SamplesToAnalise + 5];
@@ -27,12 +27,12 @@ namespace Application
         double[] valueYp1 = new double[10000];
         int counter;
 
+        System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
+
         public Application()
         {
             InitializeComponent();
             // empty chart
-          //  var header1 = listView1.Columns.Add("Nr okna", 100, HorizontalAlignment.Left);
-            //var header2 = listView1.Columns.Add("Têtno", -2, HorizontalAlignment.Center);
         }
 
         private void Application_Load(object sender, EventArgs e)
@@ -113,6 +113,8 @@ namespace Application
                     }
                     listView1.Items.Clear();
                     StripLine(this.EKGchart.ChartAreas[0], Window);
+                    watch.Stop();
+                    Console.WriteLine($"OpenFileButton_Click_1: {watch.ElapsedMilliseconds} ms");
                 }
             }
         }
@@ -127,6 +129,8 @@ namespace Application
 
         private void Start_Click(object sender, EventArgs e)
         {
+            if (!watch.IsRunning)
+                watch.Restart();
             if (buttonWasClicked == false)
             {
                 MessageBox.Show("Najpierw wybierz folder");
@@ -146,6 +150,8 @@ namespace Application
 
                 PanTompkins PanT = new PanTompkins();
                 PanT.PanTompkinsAlgorithm(amplitude, Fs, time, SamplesToAnalise, PressureChart1, PressureChart2, PressureChart3, chart4, Window, listView1);
+                watch.Stop();
+                Console.WriteLine($"Po calym Start_Click Execution Time: {watch.ElapsedMilliseconds} ms");
             }
         }
 
