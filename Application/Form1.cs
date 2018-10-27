@@ -23,6 +23,10 @@ namespace Application
         int Window = 10;
         StripLine stripline = new StripLine();
         double[] valueY = new double[SamplesToAnalise + 5];
+
+        double[] Pressure = new double[SamplesToAnalise];
+        double[] timeP = new double[SamplesToAnalise];
+
         double[] valueXp1 = new double[10000];
         double[] valueYp1 = new double[10000];
         int counter;
@@ -57,14 +61,14 @@ namespace Application
             }
 
             if (fileName != null) // if everything is OK
-            {                
+            {
                 string[] lines = File.ReadAllLines(fileName);
                 counter = File.ReadLines(fileName).Count();
                 decimal decY;
 
                 for (int i = 0; i < SamplesToAnalise; i++)
-                {                                      
-                    Decimal.TryParse(lines[i], NumberStyles.Any, CultureInfo.InvariantCulture, out decY);                  
+                {
+                    Decimal.TryParse(lines[i], NumberStyles.Any, CultureInfo.InvariantCulture, out decY);
                     valueY[i] = decimal.ToDouble(decY);
                     double Ts = 1 / Fs;
                     if (i == 0)
@@ -72,15 +76,16 @@ namespace Application
                         /*  amplitude[i] = valueY[i]/100;
                           time[i] = Ts;*/
                         amplitude[i] = valueY[i];
-                          time[i] = 0;
+                        time[i] = 0;
                     }
-                    else {
+                    else
+                    {
                         /* amplitude[i] = (valueY[i] + valueY[i - 1])/100;
                          time[i] = (i+1)*Ts; */
                         amplitude[i] = valueY[i];
                         time[i] = i * Ts;
                     }
-                    
+
                     /*string[] XY = lines[i].Split(',');
 
                     Decimal.TryParse(XY[0], NumberStyles.Any, CultureInfo.InvariantCulture, out decX);
@@ -92,30 +97,49 @@ namespace Application
                     //valueXp1[i] = double.Parse(XY[2]);
                     //valueYp1[i] = double.Parse(XY[3]); 
                 }
-                // do charts
-                var chart = this.EKGchart.ChartAreas[0];                 
+                // EKG chart
+                var chart = this.EKGchart.ChartAreas[0];
                 chart.AxisX.Title = "Time [s]";
                 chart.AxisY.Title = "Amplitude [mV]";
+                EKGchart.Series["EKG"].Points.Clear(); // clear chart
+                chart.AxisX.Minimum = 0;
+                chart.AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
+                chart.AxisX.Interval = 5;
+                this.EKGchart.Series["EKG"].Color = Color.Red;
 
-                // EKG chart
-                if (this.EKGchart.Series.IndexOf("EKG") != -1) // if it exists
+                for (int i = 0; i < SamplesToAnalise; i++)
                 {
-                    EKGchart.Series["EKG"].Points.Clear(); // clear chart
-                    chart.AxisX.Minimum = 0;
-                    chart.AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
-                    chart.AxisX.Interval = 5;
-
-                    this.EKGchart.Series["EKG"].Color = Color.Red;
-
-                    for (int i = 0; i < SamplesToAnalise; i++)
-                    {
-                        this.EKGchart.Series["EKG"].Points.AddXY(time[i], amplitude[i]);
-                    }
-                    listView1.Items.Clear();
-                    StripLine(this.EKGchart.ChartAreas[0], Window);
-                    watch.Stop();
-                    Console.WriteLine($"OpenFileButton_Click_1: {watch.ElapsedMilliseconds} ms");
+                    this.EKGchart.Series["EKG"].Points.AddXY(time[i], amplitude[i]);
                 }
+                listView1.Items.Clear();
+                StripLine(chart, Window);
+                watch.Stop();
+                Console.WriteLine($"OpenFileButton_Click_1: {watch.ElapsedMilliseconds} ms");
+
+                //PILLOW
+                for (int i = SamplesToAnalise; i < SamplesToAnalise + 1000; i++)
+                {
+                    Decimal.TryParse(lines[i], NumberStyles.Any, CultureInfo.InvariantCulture, out decY);
+                    valueY[i - SamplesToAnalise] = decimal.ToDouble(decY);
+                    double Ts = 1 / Fs *5;
+                    Pressure[i- SamplesToAnalise] = valueY[i- SamplesToAnalise];
+                    timeP[i- SamplesToAnalise] = (i- SamplesToAnalise) * Ts;
+                }
+             
+                var chartP = PressureChart1.ChartAreas[0];
+                chartP.AxisX.Title = "Time [s]";
+                chartP.AxisY.Title = "Pressure [p]";
+                PressureChart1.Series["Pressure1"].Points.Clear(); // clear chart
+                PressureChart1.Series["Pressure1"].Color = Color.Blue;
+                chartP.AxisX.Minimum = 0;
+                chartP.AxisX.Interval = 5;
+                chartP.AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
+
+                for (int i = 0; i < SamplesToAnalise; i++)
+                {
+                    PressureChart1.Series["Pressure1"].Points.AddXY(timeP[i], Pressure[i]);
+                }
+                StripLine(chartP, Window);
             }
         }
         public void StripLine(ChartArea chart, int x)
@@ -142,12 +166,19 @@ namespace Application
             if (buttonWasClicked && Window <= SamplesToAnalise / Fs)
             {
                 StripLine(this.EKGchart.ChartAreas[0], Window);
-                PressureChart1.Series["Pressure1"].Points.Clear(); // clear chart
+                StripLine(PressureChart1.ChartAreas[0], Window);
                 PressureChart2.Series["Pressure1"].Points.Clear();
                 PressureChart3.Series["Pressure1"].Points.Clear();
                 chart4.Series["Pressure1"].Points.Clear();
                 listView1.Items.Clear();
 
+                List<double> resultsPillow = new List<double>();
+
+                Pillows pillow = new Pillows();
+                resultsPillow = pillow.checkPillow(Pressure, SamplesToAnalise, Fs, Window);
+                foreach (double n in resultsPillow) {
+                    Console.WriteLine(" pillow " + n);
+                }
                 PanTompkins PanT = new PanTompkins();
                 PanT.PanTompkinsAlgorithm(amplitude, Fs, time, SamplesToAnalise, PressureChart1, PressureChart2, PressureChart3, chart4, Window, listView1);
                 watch.Stop();
@@ -159,36 +190,10 @@ namespace Application
         {
             Window = int.Parse(WindowLength.SelectedItem.ToString());
             StripLine(this.EKGchart.ChartAreas[0], Window);
+            StripLine(PressureChart1.ChartAreas[0], Window);
         }
     } 
 }
-/*
-            DatYt[dF2 + 3] = DatYt[dF2 + 2] = DatYt[dF2 + 1];
-
-            // FORWARD filter
-            double[] DatZt = new double[dF2 + 2];
-            DatZt[dF2] = DatYt[dF2 + 2];
-            DatZt[dF2 + 1] = DatYt[dF2 + 3];
-            for (long t = -dF2 + 1; t <= 0; t++)
-            {
-                if (HL == "LOW")
-                {
-                    DatZt[-t] = a * DatYt[-t + 2] + b * DatYt[-t + 3] + c * DatYt[-t + 4]
-                            + d * DatZt[-t + 1] + e * DatZt[-t + 2];
-                }
-                if (HL == "HIGH")
-                {
-                    DatZt[-t] = a1 * DatYt[-t + 2] + a2 * DatYt[-t + 3] + a3 * DatYt[-t + 4]
-                            + b1 * DatZt[-t + 1] + b2 * DatZt[-t + 2];
-                }
-            }
-            bool equals = DatZt.SequenceEqual(DatYt);
-            // Calculated points copied for return
-            for (long p = 0; p < dF2; p++)
-            {
-                data[p] = DatZt[p]; //Y
-            }
-            */
 /* Document pdfDoc = new Document(iTextSharp.text.PageSize.LETTER, 10, 10, 42, 35);
 PdfWriter.GetInstance(pdfDoc, new FileStream("Test.pdf", FileMode.Create));
 pdfDoc.Open();

@@ -56,7 +56,10 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="LowPassFilter.cs" />
-    <Compile Include="PanTompkins.cs" />
+    <Compile Include="PanTompkins.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Pillows.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">

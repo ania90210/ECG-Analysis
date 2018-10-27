@@ -10,8 +10,7 @@ using System.Windows.Forms.DataVisualization.Charting;
 namespace Application
 {
     public partial class PanTompkins : Form
-    {
-       
+    {      
         // LOW / HIGH PASS FILTER
         public static double[] Butterworth(double[] indata, double sampleRate, string HL)
         {
@@ -113,16 +112,7 @@ namespace Application
             {
                 derivative[i] = (highoriginal[i + 1] - highoriginal[i]) / (time[i + 1] - time[i]);
             }
-            PressureChart1.Titles["Title1"].Text = "DERIVATIVE";
-            PressureChart1.Series["Pressure1"].Color = Color.Blue;
-            PressureChart1.ChartAreas[0].AxisX.Minimum = 0;
-            PressureChart1.ChartAreas[0].AxisX.Interval = 5;
-            PressureChart1.ChartAreas[0].AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
-            
-            for (int i = 0; i < SamplesToAnalise; i++)
-            {
-               PressureChart1.Series["Pressure1"].Points.AddXY(time[i], derivative[i]);
-            }
+            // WYKRES
             watch.Stop();
             Console.WriteLine($"Po DERIVATIVE: Execution Time: {watch.ElapsedMilliseconds} ms");
             if (!watch.IsRunning) // checks if it is not running
@@ -212,9 +202,10 @@ namespace Application
                         int index = AboveAverage.FindIndex(w => w == max); // index of R peak == index of Time of this peak
                         double start = TimeAverage.First();
                         double end = TimeAverage.Last();
+                        double[] range = { start, end };
                         if (end - start > 0.8)
                         {
-                            difference.Add(start);
+                            difference.AddRange(range);
                             // sprawdz poduszki
                         }
 
@@ -233,7 +224,6 @@ namespace Application
                     }
                 }
             }
-            
             int number = ListOfPeaks.Count;
             for (int i = 0; i < number - 1; i++)
             {
@@ -314,15 +304,22 @@ namespace Application
                 watch.Restart();
         }
         public void HeartRate(int WindowLength, List<double> RTime, List<double> ListOfPeaks, double sampleRate, int x, int y, ListView listView1, List<double> difference)
-        {
+        {            
             int R = 0;
-            string zle = "dobrze";
-            for(int i = 0; i < difference.Count; i++)
+            string zle = "";
+            for(int i = 0; i < difference.Count; i=i+2)
             {
                 if (difference.Count != 0 && difference[i] >= y * WindowLength && difference[i] < x * WindowLength)
                 {
-                    zle = "sprawdz poduszki";
-                }
+                    if (difference[i + 1] < x * WindowLength)
+                    {
+                        zle = "sprawdz poduszki od " + y * WindowLength + " do "+ x * WindowLength;
+                    }
+                    if (difference[i + 1] >= x * WindowLength && difference[i + 1] <= (x + 1) * WindowLength)
+                    {
+                        zle = "sprawdz poduszki od " + y * WindowLength + " do " + (x + 1) * WindowLength;
+                    }
+                }                
             }
             for(int i = 0; i < RTime.Count; i++)
             {               
@@ -331,13 +328,6 @@ namespace Application
                     R++;
                 }
             }
-           /* foreach (double r in RTime)
-            {
-                if (r > sampleRate * y * WindowLength && r < WindowLength * sampleRate * x)
-                {
-                    R++;
-                }
-            }*/
             double perMinute = 60 / WindowLength;
             double HeartRate = R * perMinute;
             string NrOkna = x + "  [" + y * WindowLength + " - " + x * WindowLength + "s]";
