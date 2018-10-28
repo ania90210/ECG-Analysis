@@ -121,7 +121,7 @@ namespace Application
                 {
                     Decimal.TryParse(lines[i], NumberStyles.Any, CultureInfo.InvariantCulture, out decY);
                     valueY[i - SamplesToAnalise] = decimal.ToDouble(decY);
-                    double Ts = 1 / Fs *5;
+                    double Ts = 1 / Fs ;
                     Pressure[i- SamplesToAnalise] = valueY[i- SamplesToAnalise];
                     timeP[i- SamplesToAnalise] = (i- SamplesToAnalise) * Ts;
                 }
@@ -173,14 +173,20 @@ namespace Application
                 listView1.Items.Clear();
 
                 List<double> resultsPillow = new List<double>();
+                List<double> resultsECG = new List<double>();
 
                 Pillows pillow = new Pillows();
                 resultsPillow = pillow.checkPillow(Pressure, SamplesToAnalise, Fs, Window);
                 foreach (double n in resultsPillow) {
-                    Console.WriteLine(" pillow " + n);
+                    Console.WriteLine(" pillow: " + n);
                 }
                 PanTompkins PanT = new PanTompkins();
-                PanT.PanTompkinsAlgorithm(amplitude, Fs, time, SamplesToAnalise, PressureChart1, PressureChart2, PressureChart3, chart4, Window, listView1);
+                resultsECG = PanT.PanTompkinsAlgorithm(amplitude, Fs, time, SamplesToAnalise, PressureChart1, PressureChart2, PressureChart3, chart4, Window, listView1);
+                foreach (double n in resultsECG)
+                {
+                    Console.WriteLine(" resultsECG: " + n);
+                }
+                FinalResult(resultsPillow, resultsECG, listView1, Window);
                 watch.Stop();
                 Console.WriteLine($"Po calym Start_Click Execution Time: {watch.ElapsedMilliseconds} ms");
             }
@@ -191,6 +197,37 @@ namespace Application
             Window = int.Parse(WindowLength.SelectedItem.ToString());
             StripLine(this.EKGchart.ChartAreas[0], Window);
             StripLine(PressureChart1.ChartAreas[0], Window);
+        }
+        private void FinalResult(List<double> resultsPillow, List<double> resultsECG, ListView listView1, int Window)
+        {
+            string wynik = "";
+            for(int i = 0; i < resultsPillow.Count; i++)
+            {
+                double HR = resultsECG[i];
+                var result = new ListViewItem();
+
+                if (resultsPillow[i] >= 10) // movement
+                {
+                    if (HR >= 60 && HR <= 90) wynik = "rusza sie ale HR ok";
+                    if (HR < 60) wynik = "rusza sie ale HR za male";
+                    if (HR > 90) wynik = "ekscytuje sie/ rusza";
+                    if (HR == -1) wynik = "zmienia pozycje"; 
+                }
+                if (resultsPillow[i] < 10) // no movement
+                {
+                    if (HR >= 60 && HR <= 90) wynik = "jest ok";
+                    if (HR < 60) wynik = "tetno za male";
+                    if (HR > 90) wynik = "ZAWAL/ STRES";
+                    if (HR == -1) wynik = "COS SIE DZIEJE!?";
+                }
+                string okno = " [" + i * Window + " - " + (i + 1) * Window + "s]";
+                if (HR == -1) result = new ListViewItem(new[] { (i + 1).ToString() + okno, " ?  bpm", wynik });
+                else result = new ListViewItem(new[] { (i + 1).ToString() + okno, HR.ToString() + " bpm", wynik });
+
+                listView1.Items.Add(result);
+                result.ForeColor = (HR > 59 && HR < 91) ? Color.ForestGreen : Color.Red;
+            }
+            
         }
     } 
 }

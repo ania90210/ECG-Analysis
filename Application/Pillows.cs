@@ -42,7 +42,6 @@ namespace Application
             sum = standardD.Select(value => (value - MeanValue) * (value - MeanValue)).Sum();
             sd = Math.Sqrt(sum / (Window * sampleRate - 1));
             return sd;
-           // MessageBox.Show("standard deviation " + sd + "od " + y * Window + " do " + x * Window);
         }
     }
 }

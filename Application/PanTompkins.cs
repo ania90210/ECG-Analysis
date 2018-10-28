@@ -87,7 +87,7 @@ namespace Application
         }
         
 
-        public void PanTompkinsAlgorithm(double[] indata, double sampleRate, double[] time, int SamplesToAnalise, Chart PressureChart1, Chart PressureChart2, Chart PressureChart3, Chart chart4, int WindowLength, ListView listView1)
+        public List<double> PanTompkinsAlgorithm(double[] indata, double sampleRate, double[] time, int SamplesToAnalise, Chart PressureChart1, Chart PressureChart2, Chart PressureChart3, Chart chart4, int WindowLength, ListView listView1)
         {
             System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
             double[] lowFilter = new double[SamplesToAnalise + 5];            
@@ -288,13 +288,14 @@ namespace Application
                }
             }
             // HEART RATE
+            List<double> resultsHR = new List<double>();
             int y = 0;
             int x = 1;
             double numberOfWindows = (SamplesToAnalise / sampleRate) / WindowLength;
             double RoundWindow = Math.Round(numberOfWindows);
             for (int i = 0; i < RoundWindow; i++)
             {
-                HeartRate(WindowLength, RTime, ListOfPeaks, sampleRate, x, y, listView1, difference);
+                resultsHR.Add(HeartRate(WindowLength, RTime, ListOfPeaks, sampleRate, x, y, listView1, difference));
                 y++;
                 x++;
             }
@@ -302,22 +303,23 @@ namespace Application
             Console.WriteLine($"Po HEART RATE: Execution Time: {watch.ElapsedMilliseconds} ms");
             if (!watch.IsRunning) // checks if it is not running
                 watch.Restart();
+            return resultsHR;
         }
-        public void HeartRate(int WindowLength, List<double> RTime, List<double> ListOfPeaks, double sampleRate, int x, int y, ListView listView1, List<double> difference)
+        public double HeartRate(int WindowLength, List<double> RTime, List<double> ListOfPeaks, double sampleRate, int x, int y, ListView listView1, List<double> difference)
         {            
             int R = 0;
-            string zle = "";
+            string wynik = "";
             for(int i = 0; i < difference.Count; i=i+2)
             {
                 if (difference.Count != 0 && difference[i] >= y * WindowLength && difference[i] < x * WindowLength)
                 {
                     if (difference[i + 1] < x * WindowLength)
                     {
-                        zle = "sprawdz poduszki od " + y * WindowLength + " do "+ x * WindowLength;
+                        wynik = "check";
                     }
                     if (difference[i + 1] >= x * WindowLength && difference[i + 1] <= (x + 1) * WindowLength)
                     {
-                        zle = "sprawdz poduszki od " + y * WindowLength + " do " + (x + 1) * WindowLength;
+                        wynik = "check";
                     }
                 }                
             }
@@ -330,10 +332,13 @@ namespace Application
             }
             double perMinute = 60 / WindowLength;
             double HeartRate = R * perMinute;
-            string NrOkna = x + "  [" + y * WindowLength + " - " + x * WindowLength + "s]";
-            var result = new ListViewItem(new[] { NrOkna, HeartRate.ToString() + " bpm", zle });
+            if (wynik == "check") HeartRate = -1;
+
+           /* string NrOkna = x + "  [" + y * WindowLength + " - " + x * WindowLength + "s]";
+            var result = new ListViewItem(new[] { NrOkna, HeartRate.ToString() + " bpm" });
             listView1.Items.Add(result);
-            result.ForeColor = (HeartRate > 59 && HeartRate < 91) ? Color.ForestGreen : Color.Red;
+            result.ForeColor = (HeartRate > 59 && HeartRate < 91) ? Color.ForestGreen : Color.Red;  */         
+            return HeartRate;
         }
     }
 }
