@@ -123,14 +123,14 @@ namespace Application
             {
                 square[i] = derivative[i] * derivative[i];
             }
-            PressureChart2.Titles["Title1"].Text = "SQUARE";
+            /*PressureChart2.Titles["Title1"].Text = "SQUARE";
             PressureChart2.ChartAreas[0].AxisX.Minimum = 0;
             PressureChart2.ChartAreas[0].AxisX.Interval = 5;
             PressureChart2.ChartAreas[0].AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
             for (int i = 0; i < SamplesToAnalise; i++)
             {
                 PressureChart2.Series["Pressure1"].Points.AddXY(time[i], square[i]);
-            }
+            }*/
             watch.Stop();
             Console.WriteLine($"Po SQUERING: Execution Time: {watch.ElapsedMilliseconds} ms");
             if (!watch.IsRunning) // checks if it is not running
@@ -177,10 +177,10 @@ namespace Application
             }
 
             double maxValue = firstSamples.Max();
-            double SPK = 0.13 * maxValue;
+            double SPK = maxValue;//0.13 * maxValue;
             double NPK = 0.1 * SPK;
             double THRESHOLD = 0.25 * SPK + 0.75 * NPK;
-           //  double THRESHOLD = 0.5* maxValue;
+            //  double THRESHOLD = 0.5* maxValue;
 
             List<double> ListOfPeaks = new List<double>();            
             List<double> RTime = new List<double>();
@@ -200,15 +200,16 @@ namespace Application
                     {
                         double max = AboveAverage.Max(); // R peak
                         int index = AboveAverage.FindIndex(w => w == max); // index of R peak == index of Time of this peak
-                        double start = TimeAverage.First();
+                      /*  double start = TimeAverage.First();
                         double end = TimeAverage.Last();
                         double[] range = { start, end };
-                        if (end - start > 0.8)
+                        if (end - start > 0.2)
                         {
                             difference.AddRange(range);
+                            MessageBox.Show("jest roznica > 0.8");
                             // sprawdz poduszki
                         }
-
+                        */
                         RTime.Add(TimeAverage[index]);
                         ListOfPeaks.Add(max);
                         AboveAverage.Clear();
@@ -227,7 +228,7 @@ namespace Application
             int number = ListOfPeaks.Count;
             for (int i = 0; i < number - 1; i++)
             {
-                if(RTime[i+1] - RTime[i] < 0.49)
+                if(RTime[i+1] - RTime[i] < 0.4)//0.49
                 {
                     if (ListOfPeaks[i + 1] < ListOfPeaks[i])
                     {
@@ -238,36 +239,41 @@ namespace Application
                         ListOfPeaks[i] = 0;
                     }
                 }
-               /* double firstTime = 0;
-                double secondTime = 0;
-                for (int j = 0; j < SamplesToAnalise; j++)
+                if (i < number-2 && RTime[i + 2] - RTime[i] < 0.8)//0.49
                 {
-                    if (average[j] == ListOfPeaks[i])
-                    {
-                        firstTime = time[j];
-                    }
+                    double[] range = { RTime[i], RTime[i + 2] };
+                    difference.AddRange(range);
                 }
-                for (int j = 0; j < SamplesToAnalise; j++)
-                {
-                    if (average[j] == ListOfPeaks[i + 1])
-                    {
-                        secondTime = time[j];
-                    }
+                    /* double firstTime = 0;
+                     double secondTime = 0;
+                     for (int j = 0; j < SamplesToAnalise; j++)
+                     {
+                         if (average[j] == ListOfPeaks[i])
+                         {
+                             firstTime = time[j];
+                         }
+                     }
+                     for (int j = 0; j < SamplesToAnalise; j++)
+                     {
+                         if (average[j] == ListOfPeaks[i + 1])
+                         {
+                             secondTime = time[j];
+                         }
+                     }
+                     if ((secondTime - firstTime) < 0.45)//343
+                     {
+                         if (ListOfPeaks[i + 1] < ListOfPeaks[i])
+                         {
+                             ListOfPeaks[i + 1] = 0;
+                             RTime[i + 1] = 0;
+                         }
+                         else
+                         {
+                             ListOfPeaks[i] = 0;
+                             RTime[i] = 0;
+                         }
+                     }*/
                 }
-                if ((secondTime - firstTime) < 0.45)//343
-                {
-                    if (ListOfPeaks[i + 1] < ListOfPeaks[i])
-                    {
-                        ListOfPeaks[i + 1] = 0;
-                        RTime[i + 1] = 0;
-                    }
-                    else
-                    {
-                        ListOfPeaks[i] = 0;
-                        RTime[i] = 0;
-                    }
-                }*/
-            }
             watch.Stop();
             Console.WriteLine($"Po DETEKCJI PEAKOW: Execution Time: {watch.ElapsedMilliseconds} ms");
             if (!watch.IsRunning) // checks if it is not running
@@ -292,7 +298,7 @@ namespace Application
             int y = 0;
             int x = 1;
             double numberOfWindows = (SamplesToAnalise / sampleRate) / WindowLength;
-            double RoundWindow = Math.Round(numberOfWindows);
+            double RoundWindow = Math.Floor(numberOfWindows);//Math.Round(numberOfWindows);
             for (int i = 0; i < RoundWindow; i++)
             {
                 resultsHR.Add(HeartRate(WindowLength, RTime, ListOfPeaks, sampleRate, x, y, listView1, difference));
