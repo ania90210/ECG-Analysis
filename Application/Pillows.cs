@@ -13,6 +13,9 @@ namespace Application
     {
         public List<double> checkPillow(double[] Pressure, int SamplesToAnalise, double Fs, int Window)
         {
+            System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
+            if (!watch.IsRunning)
+                watch.Restart();
             List<double> resultsSD = new List<double>();
             int y = 0;
             int x = 1;
@@ -25,6 +28,8 @@ namespace Application
                 y++;
                 x++;
             }
+            watch.Stop();
+            Console.WriteLine($"checkPillow Execution Time: {watch.ElapsedMilliseconds} ms");
             return resultsSD;
         }
 

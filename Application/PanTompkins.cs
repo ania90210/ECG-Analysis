@@ -9,7 +9,7 @@ using System.Windows.Forms.DataVisualization.Charting;
 
 namespace Application
 {
-    public partial class PanTompkins : Form
+    class PanTompkins
     {      
         // LOW / HIGH PASS FILTER
         public static double[] Butterworth(double[] indata, double sampleRate, string HL)

@@ -49,6 +49,7 @@
     <Compile Include="CircleButton.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="CSVFile.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

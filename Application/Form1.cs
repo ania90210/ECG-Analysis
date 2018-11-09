@@ -16,7 +16,7 @@ namespace Application
     public partial class Application : Form
     {
         private bool buttonWasClicked = false;
-        static int SamplesToAnalise = 45000; //1000 //8000/ 20000;
+        static int SamplesToAnalise = 20000; //1000 //8000/ 20000;
         double[] time = new double[SamplesToAnalise + 5];
         double[] amplitude = new double[SamplesToAnalise + 5];
         double Fs = 4000;//100//400//4000;     
@@ -52,7 +52,7 @@ namespace Application
             using (OpenFileDialog ofd = new OpenFileDialog())
             {
                 ofd.InitialDirectory = "C:\\Users\\Ania\\Desktop\\Inzynierka";
-                ofd.Filter = "Zwyk³y tekst (*.txt)|*.txt";
+                ofd.Filter = "TXT (*.txt)|*.txt";
                 ofd.FilterIndex = 2;//?
                 ofd.RestoreDirectory = true;
 
@@ -207,23 +207,24 @@ namespace Application
                 List<double> resultsECG = new List<double>();
 
                 Pillows pillow = new Pillows();
-            /*    resultsPillow = pillow.checkPillow(Pressure, SamplesToAnalise, Fs, Window);
-                foreach (double n in resultsPillow) {
-                    Console.WriteLine(" pillow: " + n);
-                }
-                resultsPillow2 = pillow.checkPillow(Pressure2, SamplesToAnalise, Fs, Window);
-                foreach (double n in resultsPillow2)
-                {
-                    Console.WriteLine(" pillow 2: " + n);
-                }
-                */
+                
+                /*    resultsPillow = pillow.checkPillow(Pressure, SamplesToAnalise, Fs, Window);
+                    foreach (double n in resultsPillow) {
+                        Console.WriteLine(" pillow: " + n);
+                    }
+                    resultsPillow2 = pillow.checkPillow(Pressure2, SamplesToAnalise, Fs, Window);
+                    foreach (double n in resultsPillow2)
+                    {
+                        Console.WriteLine(" pillow 2: " + n);
+                    }
+                    */
                 PanTompkins PanT = new PanTompkins();
                 resultsECG = PanT.PanTompkinsAlgorithm(amplitude, Fs, time, SamplesToAnalise, PressureChart1, PressureChart2, PressureChart3, chart4, Window, listView1);
                 foreach (double n in resultsECG)
                 {
                     Console.WriteLine(" resultsECG: " + n);
                 }
-              //  FinalResult(resultsPillow, resultsECG, listView1, Window);
+                FinalResult(resultsPillow, resultsECG, listView1, Window);
                 watch.Stop();
                 Console.WriteLine($"Po calym Start_Click Execution Time: {watch.ElapsedMilliseconds} ms");
             }
@@ -238,12 +239,14 @@ namespace Application
         private void FinalResult(List<double> resultsPillow, List<double> resultsECG, ListView listView1, int Window)
         {
             string wynik = "";
-            for(int i = 0; i < resultsPillow.Count; i++)
+            
+            for (int i = 0; i < resultsECG.Count; i++) //resultsPillow
             {
+                
                 double HR = resultsECG[i];
                 var result = new ListViewItem();
 
-                if (resultsPillow[i] >= 10) // movement
+                /*if (resultsPillow[i] >= 10) // movement
                 {
                     if (HR >= 60 && HR <= 90) wynik = "wszystko OK";
                     if (HR < 60) wynik = "rusza sie ale HR za male";
@@ -256,38 +259,27 @@ namespace Application
                     if (HR < 60) wynik = "tetno za male";
                     if (HR > 90) wynik = "ZAWAL/ STRES";
                     if (HR == -1) wynik = "COS SIE DZIEJE!?";
-                }
+                }*/
+                if (HR >= 60 && HR <= 90) wynik = "wszystko OK";
+                if (HR < 60) wynik = "tetno za male";
+                if (HR > 90) wynik = "ZAWAL/ STRES";
+                if (HR == -1) wynik = "COS SIE DZIEJE!?";
                 string okno = " [" + i * Window + " - " + (i + 1) * Window + "s]";
                 if (HR == -1) result = new ListViewItem(new[] { (i + 1).ToString() + okno, " ?  bpm", wynik });
                 else result = new ListViewItem(new[] { (i + 1).ToString() + okno, HR.ToString() + " bpm", wynik });
-
+                if (!watch.IsRunning)
+                    watch.Restart();
                 listView1.Items.Add(result);
+                watch.Stop();
+                Console.WriteLine($"listView1.Items.Add(result); Execution Time: {watch.ElapsedMilliseconds} ms");
                 result.ForeColor = (HR > 59 && HR < 91) ? Color.ForestGreen : Color.Red;
-            }
-            
+            }           
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            
+            CSVFile CSVF = new CSVFile();
+            CSVF.csv(listView1, EKGchart);
         }
     } 
 }
-/* Document pdfDoc = new Document(iTextSharp.text.PageSize.LETTER, 10, 10, 42, 35);
-PdfWriter.GetInstance(pdfDoc, new FileStream("Test.pdf", FileMode.Create));
-pdfDoc.Open();
-using (MemoryStream stream = new MemoryStream())
-{
-    chart.SaveImage(stream, ChartImageFormat.Png);
-    iTextSharp.text.Image chartImage = iTextSharp.text.Image.GetInstance(stream.GetBuffer());
-    chartImage.ScalePercent(200f);
-    pdfDoc.Add(chartImage);
-    pdfDoc.Close();
-
-    Response.Clear();
-    Response.AppendHeader("content-disposition", "attachment;filename=Chart.pdf");
-    Response.ContentType = "application/pdf";
-    Response.WriteFile(pdfDoc);
-    Response.Flush();
-    Response.End();
-}*/
