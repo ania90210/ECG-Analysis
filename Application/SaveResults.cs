@@ -12,21 +12,21 @@ using System.Windows.Forms.DataVisualization.Charting;
 
 namespace Application
 {
-    class CSVFile
+    class SaveResults
     {
-        public void csv(ListView ListView1, Chart chart)
+        public void Save(ListView ListView1, Chart chart)
         {
             SaveFileDialog sfd = new SaveFileDialog
             {
-                Title = "Choose file to save to",
-                FileName = "wynik",
+                Title = "Zapisz folder z wynikami",
+                FileName = "",
                 FilterIndex = 0,
                 InitialDirectory = "C:\\Users\\Ania\\Desktop\\bbbb"//Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
             };
 
             if (sfd.ShowDialog() == DialogResult.OK)
             {
-                if (!Directory.Exists(sfd.FileName))
+                if (!Directory.Exists(sfd.FileName) && !File.Exists(sfd.FileName))
                 {
                     Directory.CreateDirectory(sfd.FileName);
 
@@ -47,8 +47,8 @@ namespace Application
                         table += string.Join(",     ", a) + Environment.NewLine;
                     }
                     table = table.TrimEnd('\r', '\n');
-                    File.WriteAllText(sfd.FileName+"\\wynik.csv", table);
-                    chart.SaveImage(sfd.FileName+"\\wynik.jpeg", ImageFormat.Jpeg);
+                    File.WriteAllText(sfd.FileName + "\\wynik.csv", table);
+                    chart.SaveImage(sfd.FileName + "\\wynik.jpeg", ImageFormat.Jpeg);
                 }
                 else
                 {
@@ -92,4 +92,3 @@ namespace Application
         }
     }
 }
-

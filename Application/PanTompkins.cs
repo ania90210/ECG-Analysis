@@ -112,25 +112,33 @@ namespace Application
             {
                 derivative[i] = (highoriginal[i + 1] - highoriginal[i]) / (time[i + 1] - time[i]);
             }
+            PressureChart1.Titles["Title1"].Text = "derivative";
+            PressureChart1.ChartAreas[0].AxisX.Minimum = 0;
+            PressureChart1.ChartAreas[0].AxisX.Interval = 5;
+            PressureChart1.ChartAreas[0].AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
+            for (int i = 0; i < SamplesToAnalise; i++)
+            {
+                PressureChart1.Series["Pressure1"].Points.AddXY(time[i], derivative[i]);
+            }
             // WYKRES
             watch.Stop();
             Console.WriteLine($"Po DERIVATIVE: Execution Time: {watch.ElapsedMilliseconds} ms");
             if (!watch.IsRunning) // checks if it is not running
                 watch.Restart();
             // SQUARING
-            double[] square = new double[SamplesToAnalise + 200];
+            double[] square = new double[SamplesToAnalise + 400];
             for (int i = 0; i < SamplesToAnalise; i++)
             {
                 square[i] = derivative[i] * derivative[i];
             }
-            /*PressureChart2.Titles["Title1"].Text = "SQUARE";
+            PressureChart2.Titles["Title1"].Text = "SQUARE";
             PressureChart2.ChartAreas[0].AxisX.Minimum = 0;
             PressureChart2.ChartAreas[0].AxisX.Interval = 5;
             PressureChart2.ChartAreas[0].AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
             for (int i = 0; i < SamplesToAnalise; i++)
             {
                 PressureChart2.Series["Pressure1"].Points.AddXY(time[i], square[i]);
-            }*/
+            }
             watch.Stop();
             Console.WriteLine($"Po SQUERING: Execution Time: {watch.ElapsedMilliseconds} ms");
             if (!watch.IsRunning) // checks if it is not running
@@ -139,8 +147,8 @@ namespace Application
             double[] average = new double[SamplesToAnalise + 5];
             int movingAverageFilter = 0;
             if (sampleRate == 100) movingAverageFilter = 12;
-            if (sampleRate == 400) movingAverageFilter = 100;
-            if (sampleRate == 4000) movingAverageFilter = 200;
+            if (sampleRate == 400 || sampleRate == 360) movingAverageFilter = 100;
+            if (sampleRate == 4000) movingAverageFilter = 300; // z 200
             for (int j = movingAverageFilter-1; j < SamplesToAnalise + movingAverageFilter -1; j++) //99//11
             {
                 double sum = 0;
@@ -168,7 +176,7 @@ namespace Application
             // FIRST PEAK
             int Samples = 0;
             if (sampleRate == 100) Samples = 100;
-            if (sampleRate == 400) Samples = 300;
+            if (sampleRate == 400 || sampleRate == 360) Samples = 300;
             if (sampleRate == 4000) Samples = 3000;
             double[] firstSamples = new double[Samples];
             for (int i = 0; i < Samples; i++)   
@@ -177,7 +185,7 @@ namespace Application
             }
 
             double maxValue = firstSamples.Max();
-            double SPK = maxValue;//0.13 * maxValue;
+            double SPK = 0.13 * maxValue; //maxValue;
             double NPK = 0.1 * SPK;
             double THRESHOLD = 0.25 * SPK + 0.75 * NPK;
             //  double THRESHOLD = 0.5* maxValue;
@@ -188,6 +196,8 @@ namespace Application
             List<double> TimeAverage = new List<double>();
             double[] AboveThreshold = new double[average.Length];
             List<double> difference = new List<double>();
+            List<double> Rdet = new List<double>();
+            List<double> RtooHigh = new List<double>();
             // DETECTION
             for (int i = 0; i < SamplesToAnalise; i++) // od FirstRTime = Array.FindIndex(firstSamples, w => w == maxValue);
             {
@@ -239,11 +249,13 @@ namespace Application
                         ListOfPeaks[i] = 0;
                     }
                 }
-                if (i < number-2 && RTime[i + 2] - RTime[i] < 0.8)//0.49
+                
+                /*if (i < number-2 && RTime[i + 2] - RTime[i] < 0.8)
                 {
                     double[] range = { RTime[i], RTime[i + 2] };
-                    difference.AddRange(range);
-                }
+                    difference.AddRange(range);                   
+                }*/
+                
                     /* double firstTime = 0;
                      double secondTime = 0;
                      for (int j = 0; j < SamplesToAnalise; j++)
@@ -273,7 +285,42 @@ namespace Application
                              RTime[i] = 0;
                          }
                      }*/
+            }
+            for (int i = 0; i < number; i++)
+            {
+                if (ListOfPeaks[i] != 0)
+                {
+                    Rdet.Add(RTime[i]);
                 }
+                if (ListOfPeaks[i] > maxValue*5)
+                {
+                    Console.WriteLine("za duzy r " + ListOfPeaks[i]);
+                    RtooHigh.Add(RTime[i]);
+                }
+            }
+            foreach (double d in Rdet)
+            {
+                Console.WriteLine(" Rdet " + d);
+            }
+            int numbewr = Rdet.Count;
+            Console.WriteLine("number rdet: " + numbewr);
+            for (int i = 0; i < numbewr; i++)
+            {               
+                if (i < Rdet.Count - 2 && Rdet[i + 2] - Rdet[i] < 1)
+                {
+                    double[] range = { Rdet[i], Rdet[i + 2] };
+                    difference.AddRange(range);
+                    Console.WriteLine("Rdet[i]: " + Rdet[i]);
+                }
+            }
+            foreach (double d in ListOfPeaks)
+            {
+            Console.WriteLine(" ListOfPeaks " + d);          
+            }
+            foreach (double d in RtooHigh)
+            {
+                Console.WriteLine(" Rtoohigh " + d);
+            }
             watch.Stop();
             Console.WriteLine($"Po DETEKCJI PEAKOW: Execution Time: {watch.ElapsedMilliseconds} ms");
             if (!watch.IsRunning) // checks if it is not running
@@ -301,17 +348,18 @@ namespace Application
             double RoundWindow = Math.Floor(numberOfWindows);//Math.Round(numberOfWindows);
             for (int i = 0; i < RoundWindow; i++)
             {
-                resultsHR.Add(HeartRate(WindowLength, RTime, ListOfPeaks, sampleRate, x, y, listView1, difference));
+                resultsHR.Add(HeartRate(WindowLength, RTime, ListOfPeaks, sampleRate, x, y, listView1, difference, RtooHigh));
                 y++;
                 x++;
             }
             watch.Stop();
             Console.WriteLine($"Po HEART RATE: Execution Time: {watch.ElapsedMilliseconds} ms");
+            Console.WriteLine("thresh: " + THRESHOLD + " maxvalue " + maxValue);
             if (!watch.IsRunning) // checks if it is not running
                 watch.Restart();
             return resultsHR;
         }
-        public double HeartRate(int WindowLength, List<double> RTime, List<double> ListOfPeaks, double sampleRate, int x, int y, ListView listView1, List<double> difference)
+        public double HeartRate(int WindowLength, List<double> RTime, List<double> ListOfPeaks, double sampleRate, int x, int y, ListView listView1, List<double> difference, List<double> RtooHigh)
         {            
             int R = 0;
             string wynik = "";
@@ -319,9 +367,11 @@ namespace Application
             {
                 if (difference.Count != 0 && difference[i] >= y * WindowLength && difference[i] < x * WindowLength)
                 {
+                    Console.WriteLine("range[i]: " + difference[i]);
+                    Console.WriteLine("range[i+1]: " + difference[i + 1]);
                     if (difference[i + 1] < x * WindowLength)
                     {
-                        wynik = "check";
+                        wynik = "check";                       
                     }
                     if (difference[i + 1] >= x * WindowLength && difference[i + 1] <= (x + 1) * WindowLength)
                     {
@@ -329,7 +379,14 @@ namespace Application
                     }
                 }                
             }
-            for(int i = 0; i < RTime.Count; i++)
+            for (int i = 0; i < RtooHigh.Count; i = i + 2)
+            {
+                if (RtooHigh.Count != 0 && RtooHigh[i] >= y * WindowLength && RtooHigh[i] < x * WindowLength)
+                {
+                    wynik = "check";
+                }
+            }
+            for (int i = 0; i < RTime.Count; i++)
             {               
                 if (RTime[i] > y * WindowLength && RTime[i] < x * WindowLength && ListOfPeaks[i] != 0)
                 {
