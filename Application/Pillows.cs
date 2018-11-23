@@ -38,9 +38,9 @@ namespace Application
             double MeanValue = 10;
             double sum = 0;
             double sd = 0;
-            int sampleRate = (int)Fs;
+            int sampleRate = 10;//2 /10
             List<double> standardD = new List<double>();
-            for (int i = y * Window * sampleRate; i < x * Window * sampleRate; i++)
+            for (int i = y * Window * sampleRate; i <= x * Window * sampleRate; i++)
             {
                 standardD.Add(Pressure[i]);               
             }

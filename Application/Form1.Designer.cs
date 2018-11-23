@@ -48,6 +48,7 @@ namespace Application
             System.Windows.Forms.DataVisualization.Charting.Title title10 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Title title11 = new System.Windows.Forms.DataVisualization.Charting.Title();
             this.EKGchart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.PressureChart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
@@ -96,7 +97,7 @@ namespace Application
             series1.Color = System.Drawing.Color.Red;
             series1.Name = "EKG";
             this.EKGchart.Series.Add(series1);
-            this.EKGchart.Size = new System.Drawing.Size(740, 268);
+            this.EKGchart.Size = new System.Drawing.Size(1345, 268);
             this.EKGchart.TabIndex = 1;
             this.EKGchart.Text = "chart1";
             title1.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
@@ -238,7 +239,7 @@ namespace Application
             chartArea4.BackColor = System.Drawing.Color.WhiteSmoke;
             chartArea4.Name = "ChartArea1";
             this.PressureChart3.ChartAreas.Add(chartArea4);
-            this.PressureChart3.Location = new System.Drawing.Point(769, 106);
+            this.PressureChart3.Location = new System.Drawing.Point(769, 414);
             this.PressureChart3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.PressureChart3.Name = "PressureChart3";
             series4.ChartArea = "ChartArea1";
@@ -275,13 +276,17 @@ namespace Application
             chartArea5.BackColor = System.Drawing.Color.WhiteSmoke;
             chartArea5.Name = "ChartArea1";
             this.chart4.ChartAreas.Add(chartArea5);
-            this.chart4.Location = new System.Drawing.Point(769, 378);
+            this.chart4.Location = new System.Drawing.Point(769, 681);
             this.chart4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.chart4.Name = "chart4";
             series5.ChartArea = "ChartArea1";
             series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
             series5.Name = "Pressure1";
+            series6.ChartArea = "ChartArea1";
+            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series6.Name = "Series2";
             this.chart4.Series.Add(series5);
+            this.chart4.Series.Add(series6);
             this.chart4.Size = new System.Drawing.Size(599, 242);
             this.chart4.TabIndex = 12;
             this.chart4.Text = "chart1";
