@@ -11,7 +11,7 @@ namespace Application
 {
     class Pillows
     {
-        public List<double> checkPillow(double[] Pressure, int SamplesToAnalise, double Fs, int Window)
+        public List<double> checkPillow(double[] Pressure, double[] timeP, int SamplesToAnalise, double Fs, int Window)
         {
             System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
             if (!watch.IsRunning)
@@ -20,11 +20,10 @@ namespace Application
             int y = 0;
             int x = 1;
             double numberOfWindows = (SamplesToAnalise / Fs) / Window;
-            double RoundWindow = Math.Round(numberOfWindows);
-
+            double RoundWindow = Math.Floor(numberOfWindows);;
             for (int i = 0; i < RoundWindow; i++)
             {
-                resultsSD.Add(standardDerivative(Pressure, SamplesToAnalise, Fs, Window, x, y));
+                resultsSD.Add(standardDerivative(Pressure, timeP, Window, x, y));
                 y++;
                 x++;
             }
@@ -33,19 +32,24 @@ namespace Application
             return resultsSD;
         }
 
-        public double standardDerivative(double[] Pressure, int SamplesToAnalise, double Fs, int Window, int x, int y)
+        public double standardDerivative(double[] Pressure, double[] timeP, int Window, int x, int y) // nazwa
         {
-            double MeanValue = 10;
+            double value = 0; // arytmeycna
+            double MeanValue = 0;
             double sum = 0;
             double sd = 0;
-            int sampleRate = 10;//2 /10
+            //int sampleRate = 10;
             List<double> standardD = new List<double>();
-            for (int i = y * Window * sampleRate; i <= x * Window * sampleRate; i++)
+
+            for (int i = Array.FindIndex(timeP, w => w == y * Window); i <= Array.FindIndex(timeP, w => w == x * Window); i++)
             {
-                standardD.Add(Pressure[i]);               
+                standardD.Add(Pressure[i]);
+                value = value + Pressure[i];
             }
-            sum = standardD.Select(value => (value - MeanValue) * (value - MeanValue)).Sum();
-            sd = Math.Sqrt(sum / (Window * sampleRate - 1));
+            MeanValue = value / standardD.Count();
+            Console.WriteLine("MeanValue " + MeanValue);
+            sum = standardD.Select(w => (w - MeanValue) * (w - MeanValue)).Sum();
+            sd = Math.Sqrt(sum / (standardD.Count() - 1));//(Window * sampleRate - 1)); // ?????????????????
             return sd;
         }
     }

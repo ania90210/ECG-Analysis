@@ -21,7 +21,7 @@ namespace Application
                 Title = "Zapisz folder z wynikami",
                 FileName = "",
                 FilterIndex = 0,
-                InitialDirectory = "C:\\Users\\Ania\\Desktop\\bbbb"//Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+                InitialDirectory = "C:\\Users\\Ania\\Desktop\\bbbb"//Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)// Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             };
 
             if (sfd.ShowDialog() == DialogResult.OK)
@@ -57,38 +57,6 @@ namespace Application
                     return;
                 }
             }
-
-            /*  SaveFileDialog sfd = new SaveFileDialog
-              {
-                  Title = "Choose file to save to",
-                  FileName = "wynik",
-                  Filter = "CSV (*.csv)|*.csv",
-                  FilterIndex = 0,
-                  InitialDirectory = "C:\\Users\\Ania\\Desktop\\wyn"//Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
-              };
-
-              if (sfd.ShowDialog() == DialogResult.OK)
-              {
-                  string[] headers = ListView1.Columns
-                             .OfType<ColumnHeader>()
-                             .Select(header => header.Text.Trim())
-                             .ToArray();
-
-                  string[][] items = ListView1.Items
-                              .OfType<ListViewItem>()
-                              .Select(lvi => lvi.SubItems
-                                  .OfType<ListViewItem.ListViewSubItem>()
-                                  .Select(si => si.Text).ToArray()).ToArray();
-
-                  string table = string.Join(",     ", headers) + Environment.NewLine;
-                  foreach (string[] a in items)
-                  {
-                      //a = a_loopVariable;
-                      table += string.Join(",     ", a) + Environment.NewLine;
-                  }
-                  table = table.TrimEnd('\r', '\n');
-                  File.WriteAllText(sfd.FileName, table);
-              }*/
         }
     }
 }

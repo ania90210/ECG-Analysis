@@ -87,7 +87,7 @@ namespace Application
         }
         
 
-        public List<double> PanTompkinsAlgorithm(double[] indata, double sampleRate, double[] time, int SamplesToAnalise, Chart PressureChart1, Chart PressureChart2, Chart PressureChart3, Chart chart4, int WindowLength, ListView listView1)
+        public List<double> PanTompkinsAlgorithm(double[] indata, double sampleRate, double[] time, int SamplesToAnalise, Chart EKGchart, Chart PressureChart2, Chart PressureChart3, Chart chart4, int WindowLength, ListView listView1)
         {
             System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
             double[] lowFilter = new double[SamplesToAnalise + 5];            
@@ -296,12 +296,12 @@ namespace Application
                 {
                     Rdet.Add(RTime[i]);
                 }
-                if (ListOfPeaks[i] != 0 && ListOfPeaks[i] > maxValue*2) // jezeli peak R jest za duzy
+                if (ListOfPeaks[i] != 0 && ListOfPeaks[i] > maxValue*3) // jezeli peak R jest za duzy
                 {
                     Console.WriteLine("za duzy r " + ListOfPeaks[i]);
                     RtooHigh_Low.Add(RTime[i]);
                 }
-                else if (ListOfPeaks[i] != 0 && ListOfPeaks[i] < maxValue * 0.5) // jezeli peak R jest za maly 0.3
+                else if (ListOfPeaks[i] != 0 && ListOfPeaks[i] < maxValue * 0.4) // jezeli peak R jest za maly 0.3
                 {
                     Console.WriteLine("za male r " + ListOfPeaks[i]);
                     RtooHigh_Low.Add(RTime[i]);
@@ -376,12 +376,15 @@ namespace Application
                {
                    if (average[i] == K)
                    {
+                        
                         chart4.Titles["Title1"].Text = "PEAK";
                         chart4.ChartAreas[0].AxisX.Minimum = 0;
                         chart4.ChartAreas[0].AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
                         chart4.ChartAreas[0].AxisX.Interval = 5;
                         chart4.Series["Pressure1"].Color = Color.Brown;
                         chart4.Series["Pressure1"].Points.AddXY(time[i], K); //AboveThreshold[i]
+                        EKGchart.Series["Peaks"].ChartType = SeriesChartType.FastPoint;
+                        EKGchart.Series["Peaks"].Points.AddXY(time[i], indata[i]);
                     }
                }
             }
@@ -434,7 +437,7 @@ namespace Application
                     Rerror++;
                 }
             }
-            if (Rerror < 3 && wynik != "noise") { wynik = ""; R = R - Rerror; }
+           // if (Rerror < 3 && wynik != "noise") { wynik = ""; R = R - Rerror; }
             for (int i = 0; i < RTime.Count; i++)
             {
                 if (RTime[i] >= y * WindowLength && RTime[i] <= x * WindowLength && ListOfPeaks[i] != 0)

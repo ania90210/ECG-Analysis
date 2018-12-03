@@ -28,26 +28,28 @@ namespace Application
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataVisualization.Charting.AnnotationGroup annotationGroup1 = new System.Windows.Forms.DataVisualization.Charting.AnnotationGroup();
+            System.Windows.Forms.DataVisualization.Charting.VerticalLineAnnotation verticalLineAnnotation1 = new System.Windows.Forms.DataVisualization.Charting.VerticalLineAnnotation();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Title title1 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataVisualization.Charting.Title title2 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataVisualization.Charting.Title title3 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Title title4 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataVisualization.Charting.Title title5 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataVisualization.Charting.Title title6 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Title title7 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataVisualization.Charting.Title title8 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataVisualization.Charting.Title title9 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Title title10 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Title title11 = new System.Windows.Forms.DataVisualization.Charting.Title();
             this.EKGchart = new System.Windows.Forms.DataVisualization.Charting.Chart();
@@ -73,6 +75,11 @@ namespace Application
             // 
             // EKGchart
             // 
+            verticalLineAnnotation1.LineColor = System.Drawing.Color.Maroon;
+            verticalLineAnnotation1.Name = "VA";
+            annotationGroup1.Annotations.Add(verticalLineAnnotation1);
+            annotationGroup1.Name = "AnnotationGroup";
+            this.EKGchart.Annotations.Add(annotationGroup1);
             this.EKGchart.BackColor = System.Drawing.Color.DarkGray;
             this.EKGchart.BackGradientStyle = System.Windows.Forms.DataVisualization.Charting.GradientStyle.TopBottom;
             this.EKGchart.BackSecondaryColor = System.Drawing.Color.Gainsboro;
@@ -86,18 +93,23 @@ namespace Application
             chartArea1.Position.Auto = false;
             chartArea1.Position.Height = 87F;
             chartArea1.Position.Width = 94F;
-            chartArea1.Position.X = 5F;
+            chartArea1.Position.X = 2F;
             chartArea1.Position.Y = 6F;
             this.EKGchart.ChartAreas.Add(chartArea1);
-            this.EKGchart.Location = new System.Drawing.Point(23, 106);
+            this.EKGchart.Location = new System.Drawing.Point(23, 102);
             this.EKGchart.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.EKGchart.Name = "EKGchart";
             series1.ChartArea = "ChartArea1";
             series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
             series1.Color = System.Drawing.Color.Red;
             series1.Name = "EKG";
+            series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastPoint;
+            series2.Color = System.Drawing.Color.Blue;
+            series2.Name = "Peaks";
             this.EKGchart.Series.Add(series1);
-            this.EKGchart.Size = new System.Drawing.Size(1345, 268);
+            this.EKGchart.Series.Add(series2);
+            this.EKGchart.Size = new System.Drawing.Size(1318, 268);
             this.EKGchart.TabIndex = 1;
             this.EKGchart.Text = "chart1";
             title1.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
@@ -106,7 +118,13 @@ namespace Application
             title1.Text = "Czas [s]";
             title2.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Left;
             title2.Name = "Title2";
+            title2.Position.Auto = false;
+            title2.Position.Height = 84.72366F;
+            title2.Position.Width = 1.272423F;
+            title2.Position.X = 2F;
+            title2.Position.Y = 3F;
             title2.Text = "Amplituda [V]";
+            title2.TextOrientation = System.Windows.Forms.DataVisualization.Charting.TextOrientation.Rotated270;
             title3.Alignment = System.Drawing.ContentAlignment.TopCenter;
             title3.DockingOffset = -3;
             title3.Name = "Title3";
@@ -130,14 +148,14 @@ namespace Application
             chartArea2.Position.X = 5F;
             chartArea2.Position.Y = 6F;
             this.PressureChart1.ChartAreas.Add(chartArea2);
-            this.PressureChart1.Location = new System.Drawing.Point(23, 388);
+            this.PressureChart1.Location = new System.Drawing.Point(23, 393);
             this.PressureChart1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.PressureChart1.Name = "PressureChart1";
-            series2.ChartArea = "ChartArea1";
-            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series2.Name = "Pressure1";
-            this.PressureChart1.Series.Add(series2);
-            this.PressureChart1.Size = new System.Drawing.Size(740, 268);
+            series3.ChartArea = "ChartArea1";
+            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series3.Name = "Pressure1";
+            this.PressureChart1.Series.Add(series3);
+            this.PressureChart1.Size = new System.Drawing.Size(1318, 268);
             this.PressureChart1.TabIndex = 3;
             this.PressureChart1.Text = "chart2";
             title4.Alignment = System.Drawing.ContentAlignment.BottomCenter;
@@ -202,16 +220,16 @@ namespace Application
             chartArea3.Position.X = 5F;
             chartArea3.Position.Y = 6F;
             this.PressureChart2.ChartAreas.Add(chartArea3);
-            this.PressureChart2.Location = new System.Drawing.Point(23, 681);
+            this.PressureChart2.Location = new System.Drawing.Point(23, 686);
             this.PressureChart2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.PressureChart2.Name = "PressureChart2";
-            series3.ChartArea = "ChartArea1";
-            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series3.CustomProperties = "IsXAxisQuantitative=False";
-            series3.Legend = "Legend1";
-            series3.Name = "Pressure1";
-            this.PressureChart2.Series.Add(series3);
-            this.PressureChart2.Size = new System.Drawing.Size(740, 268);
+            series4.ChartArea = "ChartArea1";
+            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series4.CustomProperties = "IsXAxisQuantitative=False";
+            series4.Legend = "Legend1";
+            series4.Name = "Pressure1";
+            this.PressureChart2.Series.Add(series4);
+            this.PressureChart2.Size = new System.Drawing.Size(1318, 268);
             this.PressureChart2.TabIndex = 7;
             this.PressureChart2.Text = "chart1";
             title7.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
@@ -239,13 +257,13 @@ namespace Application
             chartArea4.BackColor = System.Drawing.Color.WhiteSmoke;
             chartArea4.Name = "ChartArea1";
             this.PressureChart3.ChartAreas.Add(chartArea4);
-            this.PressureChart3.Location = new System.Drawing.Point(769, 414);
+            this.PressureChart3.Location = new System.Drawing.Point(1374, 323);
             this.PressureChart3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.PressureChart3.Name = "PressureChart3";
-            series4.ChartArea = "ChartArea1";
-            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series4.Name = "Pressure1";
-            this.PressureChart3.Series.Add(series4);
+            series5.ChartArea = "ChartArea1";
+            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series5.Name = "Pressure1";
+            this.PressureChart3.Series.Add(series5);
             this.PressureChart3.Size = new System.Drawing.Size(599, 242);
             this.PressureChart3.TabIndex = 8;
             this.PressureChart3.Text = "chart1";
@@ -276,16 +294,12 @@ namespace Application
             chartArea5.BackColor = System.Drawing.Color.WhiteSmoke;
             chartArea5.Name = "ChartArea1";
             this.chart4.ChartAreas.Add(chartArea5);
-            this.chart4.Location = new System.Drawing.Point(769, 681);
+            this.chart4.Location = new System.Drawing.Point(1374, 478);
             this.chart4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.chart4.Name = "chart4";
-            series5.ChartArea = "ChartArea1";
-            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
-            series5.Name = "Pressure1";
             series6.ChartArea = "ChartArea1";
-            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series6.Name = "Series2";
-            this.chart4.Series.Add(series5);
+            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
+            series6.Name = "Pressure1";
             this.chart4.Series.Add(series6);
             this.chart4.Size = new System.Drawing.Size(599, 242);
             this.chart4.TabIndex = 12;
@@ -303,10 +317,10 @@ namespace Application
             this.listView1.Font = new System.Drawing.Font("Arial", 10.8F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.listView1.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.listView1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-            this.listView1.Location = new System.Drawing.Point(1374, 258);
+            this.listView1.Location = new System.Drawing.Point(1364, 171);
             this.listView1.Margin = new System.Windows.Forms.Padding(3, 25, 3, 25);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(609, 475);
+            this.listView1.Size = new System.Drawing.Size(609, 368);
             this.listView1.TabIndex = 13;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
@@ -323,7 +337,7 @@ namespace Application
             // 
             // columnHeader3
             // 
-            this.columnHeader3.Text = "Wynik";
+            this.columnHeader3.Text = "Ocena";
             this.columnHeader3.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.columnHeader3.Width = 250;
             // 
@@ -343,7 +357,7 @@ namespace Application
             this.button1.BackColor = System.Drawing.Color.PaleTurquoise;
             this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button1.Font = new System.Drawing.Font("Arial", 10.2F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
-            this.button1.Location = new System.Drawing.Point(1634, 780);
+            this.button1.Location = new System.Drawing.Point(1638, 819);
             this.button1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(164, 70);
@@ -359,7 +373,7 @@ namespace Application
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.ClientSize = new System.Drawing.Size(1924, 969);
+            this.ClientSize = new System.Drawing.Size(1924, 992);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.listView1);
@@ -375,7 +389,6 @@ namespace Application
             this.MaximumSize = new System.Drawing.Size(2554, 1310);
             this.Name = "Application";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Okno";
             this.Load += new System.EventHandler(this.Application_Load);
             ((System.ComponentModel.ISupportInitialize)(this.EKGchart)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.PressureChart1)).EndInit();
