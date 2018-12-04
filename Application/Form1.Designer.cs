@@ -93,7 +93,7 @@ namespace Application
             chartArea1.Position.Auto = false;
             chartArea1.Position.Height = 87F;
             chartArea1.Position.Width = 94F;
-            chartArea1.Position.X = 2F;
+            chartArea1.Position.X = 4F;
             chartArea1.Position.Y = 6F;
             this.EKGchart.ChartAreas.Add(chartArea1);
             this.EKGchart.Location = new System.Drawing.Point(23, 102);
@@ -121,7 +121,7 @@ namespace Application
             title2.Position.Auto = false;
             title2.Position.Height = 84.72366F;
             title2.Position.Width = 1.272423F;
-            title2.Position.X = 2F;
+            title2.Position.X = 3F;
             title2.Position.Y = 3F;
             title2.Text = "Amplituda [V]";
             title2.TextOrientation = System.Windows.Forms.DataVisualization.Charting.TextOrientation.Rotated270;
@@ -145,7 +145,7 @@ namespace Application
             chartArea2.Position.Auto = false;
             chartArea2.Position.Height = 87F;
             chartArea2.Position.Width = 94F;
-            chartArea2.Position.X = 5F;
+            chartArea2.Position.X = 4F;
             chartArea2.Position.Y = 6F;
             this.PressureChart1.ChartAreas.Add(chartArea2);
             this.PressureChart1.Location = new System.Drawing.Point(23, 393);
@@ -165,7 +165,13 @@ namespace Application
             title4.Text = "Czas [s]";
             title5.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Left;
             title5.Name = "Title2";
+            title5.Position.Auto = false;
+            title5.Position.Height = 84.72366F;
+            title5.Position.Width = 1.272423F;
+            title5.Position.X = 3F;
+            title5.Position.Y = 3F;
             title5.Text = "Ciœnienie [Pa]";
+            title5.TextOrientation = System.Windows.Forms.DataVisualization.Charting.TextOrientation.Rotated270;
             title6.Alignment = System.Drawing.ContentAlignment.TopCenter;
             title6.DockingOffset = -3;
             title6.Name = "Title3";
@@ -191,6 +197,7 @@ namespace Application
             // 
             // WindowLength
             // 
+            this.WindowLength.Enabled = false;
             this.WindowLength.Font = new System.Drawing.Font("Arial", 10.2F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.WindowLength.FormattingEnabled = true;
             this.WindowLength.Items.AddRange(new object[] {
@@ -217,7 +224,7 @@ namespace Application
             chartArea3.Position.Auto = false;
             chartArea3.Position.Height = 87F;
             chartArea3.Position.Width = 94F;
-            chartArea3.Position.X = 5F;
+            chartArea3.Position.X = 4F;
             chartArea3.Position.Y = 6F;
             this.PressureChart2.ChartAreas.Add(chartArea3);
             this.PressureChart2.Location = new System.Drawing.Point(23, 686);
@@ -238,7 +245,13 @@ namespace Application
             title7.Text = "Czas [s]";
             title8.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Left;
             title8.Name = "Title2";
+            title8.Position.Auto = false;
+            title8.Position.Height = 84.72366F;
+            title8.Position.Width = 1.272423F;
+            title8.Position.X = 3F;
+            title8.Position.Y = 3F;
             title8.Text = "Ciœnienie [Pa]";
+            title8.TextOrientation = System.Windows.Forms.DataVisualization.Charting.TextOrientation.Rotated270;
             title9.Alignment = System.Drawing.ContentAlignment.TopCenter;
             title9.DockingOffset = -3;
             title9.Name = "Title3";

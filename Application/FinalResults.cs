@@ -28,21 +28,21 @@ namespace Application
                     HR = 0;
                 }
 
-                else if (resultsPillow1[i] >= 4 && resultsPillow2[i] >= 4) // movement && resultsPillow2[i] >= 10
+                else if (resultsPillow1[i] >= 2 && resultsPillow2[i] >= 2) // movement && resultsPillow2[i] >= 10
                 {
                     if (HR >= 60 && HR <= 90) wynik = "Wszystko OK";
-                    else if (HR > 40 && HR < 60) wynik = "rusza sie ale HR za male";
-                    else if (HR > 90 && HR < 120) wynik = "ekscytuje sie/ rusza";
+                    else if (HR > 40 && HR < 60) wynik = "Tętno za małe";
+                    else if (HR > 90 && HR < 120) wynik = "Tętno za duże";
                     else if (HR == 0 || HR < 40) wynik = "Zmiana pozycji";
                     else if (HR < 0 && HR + 200 < 40) {wynik = "Zmiana pozycji"; HR = 0; }
                     else if (HR < 0) { wynik = "Arytmia serca"; HR = HR + 200; }
                 }
-               else if (resultsPillow1[i] < 4 && resultsPillow2[i] < 4) // no movement
+               else if (resultsPillow1[i] < 2 && resultsPillow2[i] < 2) // no movement
                 {
                     if (HR >= 60 && HR <= 90) wynik = "Wszystko OK";
-                    else if (HR > 40 && HR < 60) wynik = "tetno za male";
-                    else if(HR > 90 && HR < 120) wynik = "ZAWAL/ STRES";
-                    else if (HR == 0) wynik = "COS SIE DZIEJE!?";
+                    else if (HR > 40 && HR < 60) wynik = "Tętno za małe";
+                    else if(HR > 90 && HR < 120) wynik = "Tętno za duże";
+                    else if (HR == 0) wynik = "ALERT!";
                     else if (HR < 0) { wynik = "Arytmia serca"; HR = HR + 200; }
                 }
 
