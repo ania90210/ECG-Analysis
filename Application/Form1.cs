@@ -28,7 +28,6 @@ namespace Application
 
         double[] Pressure2 = new double[PressureSamples + 5];
         double[] timeP2 = new double[PressureSamples + 5];
-        System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
 
         public Application()
         {
@@ -253,10 +252,6 @@ namespace Application
                         dg.VerticalLine(EKGchart, i, time);
                         dg.VerticalLine(PressureChart1, i, timeP1);
                         dg.VerticalLine(PressureChart2, i, timeP2);
-
-                   /* VerticalLine(EKGchart, i);
-                        VerticalLine(PressureChart1, i);
-                        VerticalLine(PressureChart2, i);*/
                     }
                 }
         }

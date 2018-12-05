@@ -14,7 +14,6 @@ namespace Application
         public List<double> PanTompkinsAlgorithm(double[] indata, double sampleRate, double[] time, int SamplesToAnalise, Chart EKGchart, 
             Chart PressureChart2, Chart PressureChart3, Chart chart4, int WindowLength, ListView listView1)
         {
-            System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
             double[] lowFilter = new double[SamplesToAnalise + 5];            
             double[] highFilter = new double[SamplesToAnalise + 5];
 
@@ -79,10 +78,7 @@ namespace Application
             {
                 PressureChart3.Series["Pressure1"].Points.AddXY(time[i], average[i]);
             }
-            watch.Stop();
-            Console.WriteLine($"Po MOVING AVERAGE FILTER: Execution Time: {watch.ElapsedMilliseconds} ms");
-            if (!watch.IsRunning) // checks if it is not running
-                watch.Restart();
+            
             // FIRST PEAK
             int Samples = 0;
             if (sampleRate == 100) Samples = 100;
@@ -240,10 +236,7 @@ namespace Application
             {
                 Console.WriteLine(" RtooHigh_Low " + d);
             }           
-            watch.Stop();
-            Console.WriteLine($"Po DETEKCJI PEAKOW: Execution Time: {watch.ElapsedMilliseconds} ms");
-            if (!watch.IsRunning) // checks if it is not running
-                watch.Restart();
+
             foreach (double K in ListOfPeaks)
             {
                 for (int i = 0; i < SamplesToAnalise; i++)
@@ -274,11 +267,6 @@ namespace Application
                 y++;
                 x++;
             }
-            watch.Stop();
-            Console.WriteLine($"Po HEART RATE: Execution Time: {watch.ElapsedMilliseconds} ms");
-            
-            if (!watch.IsRunning) // checks if it is not running
-                watch.Restart();
             return resultsHR;
         }
         private double HeartRate(int WindowLength, List<double> RTime, List<double> ListOfPeaks, double sampleRate, int x, int y, ListView listView1, List<double> error, List<double> RtooHigh_Low)
