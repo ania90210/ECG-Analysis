@@ -32,10 +32,8 @@ namespace Application
             chart.AxisX.IntervalOffset = 0;
             EKGchart.Series["EKG"].Color = Color.Red;
             EKGchart.Series[0].ChartType = SeriesChartType.FastLine;
-
             chart.AxisX.LabelStyle.Format = "#";
             chart.AxisX.ScaleView.Zoom(0, 11);
-
             chart.AxisX.ScrollBar.ButtonStyle = ScrollBarButtonStyles.SmallScroll;
             chart.AxisX.ScaleView.SmallScrollSize = 5;
             for (int i = 0; i < SamplesToAnalise; i++)
@@ -109,15 +107,12 @@ namespace Application
             chartP2.AxisX.Minimum = 0;
             chartP2.AxisX.Interval = 5;
             chartP2.AxisX.Maximum = Math.Round(timeP2[PressureSamples - 1]);
-
             chartP2.AxisX.Interval = 1;
             chartP2.AxisX.IntervalOffset = 0;
             chartP2.AxisX.ScaleView.Zoom(0, 11);
             chartP2.AxisX.LabelStyle.Format = "#";
-
             chartP2.AxisX.ScrollBar.ButtonStyle = ScrollBarButtonStyles.SmallScroll;
             chartP2.AxisX.ScaleView.SmallScrollSize = 5;
-
             PressureChart2.Series[0].ChartType = SeriesChartType.FastLine;
 
             for (int i = 0; i < PressureSamples; i++)

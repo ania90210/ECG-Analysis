@@ -68,16 +68,6 @@ namespace Application
 
                 average[j - (movingAverageFilter - 1)] = sum / movingAverageFilter;
             }
-
-            PressureChart3.Titles["Title1"].Text = "MOVING AVERAGE FILTER";
-            PressureChart3.Series["Pressure1"].Color = Color.DeepPink;
-            PressureChart3.ChartAreas[0].AxisX.Minimum = 0;
-            PressureChart3.ChartAreas[0].AxisX.Interval = 5;
-            PressureChart3.ChartAreas[0].AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
-            for (int i = 0; i < SamplesToAnalise; i++)
-            {
-                PressureChart3.Series["Pressure1"].Points.AddXY(time[i], average[i]);
-            }
             
             // FIRST PEAK
             int Samples = 0;
@@ -108,39 +98,21 @@ namespace Application
             List<double> RtooHigh_Low = new List<double>();
             List<double> RDistance = new List<double>();
             // DETECTION
-            for (int i = Array.FindIndex(firstSamples, w => w == maxValue); i < SamplesToAnalise; i++) // od FirstRTime = Array.FindIndex(firstSamples, w => w == maxValue);
+            for (int i = Array.FindIndex(firstSamples, w => w == maxValue); i < SamplesToAnalise; i++) 
             {
                 if (average[i] > THRESHOLD)
                 {
                     AboveAverage.Add(average[i]);
                     TimeAboveAverage.Add(time[i]);
-                    // AboveThreshold[i] = average[i];
+
                     if (average[i + 1] < THRESHOLD)
                     {
                         double max = AboveAverage.Max(); // R peak
                         int index = AboveAverage.FindIndex(w => w == max); // index of R peak == index of Time of this peak
-                      /*  double start = TimeAboveAverage.First();
-                        double end = TimeAboveAverage.Last();
-                        double[] range = { start, end };
-                        if (end - start > 0.2)
-                        {
-                            difference.AddRange(range);
-                            MessageBox.Show("jest roznica > 0.8");
-                            // sprawdz poduszki
-                        }
-                        */
                         RTime.Add(TimeAboveAverage[index]);
                         ListOfPeaks.Add(max);
                         AboveAverage.Clear();
                         TimeAboveAverage.Clear();
-
-                        /*
-                        // RTime.Add(Array.FindIndex(AboveThreshold, w => w == AboveThreshold.Max()));
-                        int indx = (Array.FindIndex(AboveThreshold, w => w == AboveThreshold.Max()));
-                        RTime.Add(time[indx]);
-                        ListOfPeaks.Add(AboveThreshold.Max());
-                        Array.Clear(AboveThreshold, 0, AboveThreshold.Length);
-                        */
                     }
                 }
             }
@@ -278,17 +250,7 @@ namespace Application
             {
                 if (error.Count != 0 && error[i] >= y * WindowLength && error[i] < x * WindowLength)
                 {
-                    Console.WriteLine("range[i]: " + error[i]);
-                    Console.WriteLine("range[i+1]: " + error[i + 1]);
                     result = "noise";
-                    /*     if (error[i + 1] < x * WindowLength)
-                         {
-                             result = "check";                       
-                         }
-                         if (error[i + 1] >= x * WindowLength && error[i + 1] <= (x + 1) * WindowLength)
-                         {
-                             result = "check";
-                         }*/
                 }                
             }
             for (int i = 0; i < RtooHigh_Low.Count; i++) //+2
