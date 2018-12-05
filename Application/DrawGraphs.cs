@@ -127,8 +127,8 @@ namespace Application
 
         public void VerticalLine(Chart chart, int x, double[] time)
         {
-            VerticalLineAnnotation VA;
-            VA = new VerticalLineAnnotation();
+
+            VerticalLineAnnotation VA = new VerticalLineAnnotation();
             VA.AxisX = chart.ChartAreas[0].AxisX;
             VA.AllowMoving = false;
             VA.Visible = true;

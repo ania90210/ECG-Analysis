@@ -52,8 +52,7 @@ namespace Application
                 }
                 else
                 {
-                    MessageBox.Show("CHANGE THE NAME");
-                    Console.WriteLine("File already exists.");
+                    MessageBox.Show("Zmień nazwę");
                     return;
                 }
             }

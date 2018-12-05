@@ -74,16 +74,15 @@ namespace Application
                 DrawGraphs dg = new DrawGraphs();
                 dg.Graphs(Fs, PressureSamples, lines, EKGchart, PressureChart1, PressureChart2, SamplesToAnalise, PressureSamples,
                 time, amplitude, Window, Pressure1, timeP1, Pressure2, timeP2);
-
+                buttonAnaliseClicked = false;
             }
         }
         
         private void Start_Click(object sender, EventArgs e)
         {
-            buttonAnaliseClicked = true;
-            if (buttonOpenFileClicked == false)
+            if (!buttonOpenFileClicked)
             {
-                MessageBox.Show("Najpierw wybierz folder");
+                MessageBox.Show("Wybierz plik do analizy");
             }
             if (Window > SamplesToAnalise / Fs)
             {
@@ -118,6 +117,7 @@ namespace Application
                 }
                 FinalResults FR = new FinalResults();
                 FR.FinalResult(resultsPillow1, resultsPillow2, resultsECG, listView1, Window);
+                buttonAnaliseClicked = true;
             }
         }
 
@@ -142,9 +142,9 @@ namespace Application
 
         private void saveButton_Click(object sender, EventArgs e)
         {
-            if (buttonOpenFileClicked == false) MessageBox.Show("Wybierz plik do analizy");
-            else if (buttonAnaliseClicked == false && buttonOpenFileClicked == true) MessageBox.Show("Najpierw rozpocznij analizê");
-            else if (buttonAnaliseClicked == true && buttonOpenFileClicked == true)
+            if (!buttonOpenFileClicked) MessageBox.Show("Wybierz plik do analizy");
+            else if (!buttonAnaliseClicked && buttonOpenFileClicked == true && listView1.Items.Count == 0) MessageBox.Show("Najpierw rozpocznij analizê");
+            else if (buttonAnaliseClicked == true && buttonOpenFileClicked == true && listView1.Items.Count !=0)
             {
                 SaveResults sr = new SaveResults();
                 EKGchart.ChartAreas[0].AxisX.ScaleView.ZoomReset();

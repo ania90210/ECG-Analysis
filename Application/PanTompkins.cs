@@ -10,7 +10,18 @@ using System.Windows.Forms.DataVisualization.Charting;
 namespace Application
 {
     class PanTompkins
-    {      
+    {
+        List<double> ListOfPeaks = new List<double>();
+        List<double> RTime = new List<double>();
+        List<double> AboveAverage = new List<double>();
+        List<double> TimeAboveAverage = new List<double>();
+        List<double> error = new List<double>();
+        List<double> RTimeDetected = new List<double>();
+        List<double> RtooHigh_Low = new List<double>();
+        List<double> RDistance = new List<double>();
+        List<double> resultsHR = new List<double>();
+        double HeartRate;
+
         public List<double> PanTompkinsAlgorithm(double[] indata, double sampleRate, double[] time, int SamplesToAnalise, Chart EKGchart, 
             Chart PressureChart2, Chart PressureChart3, Chart chart4, int WindowLength, ListView listView1)
         {
@@ -88,15 +99,7 @@ namespace Application
             //  double THRESHOLD = 0.5* maxValue;
             Console.WriteLine("thresh: " + THRESHOLD + " maxvalue " + maxValue + " time " + Array.FindIndex(firstSamples, w => w == maxValue));
 
-            List<double> ListOfPeaks = new List<double>();            
-            List<double> RTime = new List<double>();
-            List<double> AboveAverage = new List<double>();
-            List<double> TimeAboveAverage = new List<double>();
-           // double[] AboveThreshold = new double[average.Length];
-            List<double> error = new List<double>();
-            List<double> RTimeDetected = new List<double>();
-            List<double> RtooHigh_Low = new List<double>();
-            List<double> RDistance = new List<double>();
+            
             // DETECTION
             for (int i = Array.FindIndex(firstSamples, w => w == maxValue); i < SamplesToAnalise; i++) 
             {
@@ -228,20 +231,19 @@ namespace Application
                }
             }
             // HEART RATE
-            List<double> resultsHR = new List<double>();
             int y = 0;
             int x = 1;
             double numberOfWindows = (SamplesToAnalise / sampleRate) / WindowLength;
             double RoundWindow = Math.Floor(numberOfWindows);//Math.Round(numberOfWindows);
             for (int i = 0; i < RoundWindow; i++)
             {
-                resultsHR.Add(HeartRate(WindowLength, RTime, ListOfPeaks, sampleRate, x, y, listView1, error, RtooHigh_Low));
+                resultsHR.Add(CalculateHeartRate(WindowLength, RTime, ListOfPeaks, sampleRate, x, y, listView1, error, RtooHigh_Low));
                 y++;
                 x++;
             }
             return resultsHR;
         }
-        private double HeartRate(int WindowLength, List<double> RTime, List<double> ListOfPeaks, double sampleRate, int x, int y, ListView listView1, List<double> error, List<double> RtooHigh_Low)
+        private double CalculateHeartRate(int WindowLength, List<double> RTime, List<double> ListOfPeaks, double sampleRate, int x, int y, ListView listView1, List<double> error, List<double> RtooHigh_Low)
         {            
             int R = 0;
             int Rerror = 0;
@@ -271,7 +273,7 @@ namespace Application
             }
            // if (RtooHigh_Low.Count < 3 && result != "noise") { result = ""; R = R - RtooHigh_Low.Count;  }
             double perMinute = 60 / WindowLength;
-            double HeartRate = R * perMinute;
+            HeartRate = R * perMinute;
             if (result == "noise") HeartRate = 0;
             else if (result == "irregularity") HeartRate = HeartRate - 200;
 

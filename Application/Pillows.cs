@@ -11,9 +11,10 @@ namespace Application
 {
     class Pillows
     {
+        List<double> resultsSD = new List<double>();
+
         public List<double> checkPillow(double[] Pressure, double[] timeP, int SamplesToAnalise, double Fs, int Window)
-        {
-            List<double> resultsSD = new List<double>();
+        {           
             int y = 0;
             int x = 1;
             double numberOfWindows = (SamplesToAnalise / Fs) / Window;
