@@ -15,20 +15,19 @@ namespace Application
 {
     public partial class Application : Form
     {
-        private bool buttonWasClicked = false;
+        bool buttonOpenFileClicked = false;
         bool buttonAnaliseClicked = false;
         static int SamplesToAnalise = 45000; //1000 //8000/ 20000 /21600 /45000 ;
-        static int PressureNumber = 100; //120 /100
+        static int PressureSamples = 45000; //120 /100
         double[] time = new double[SamplesToAnalise + 5];
         double[] amplitude = new double[SamplesToAnalise + 5];
         double Fs = 4500;//100//400//4500 //360;  
         int Window = 5;
-        double[] Pressure1 = new double[SamplesToAnalise + 5];
-        double[] timeP1 = new double[SamplesToAnalise + 5];
+        double[] Pressure1 = new double[PressureSamples + 5];
+        double[] timeP1 = new double[PressureSamples + 5];
 
-        double[] Pressure2 = new double[SamplesToAnalise + 5];
-        double[] timeP2 = new double[SamplesToAnalise + 5];
-        VerticalLineAnnotation VA;
+        double[] Pressure2 = new double[PressureSamples + 5];
+        double[] timeP2 = new double[PressureSamples + 5];
         System.Diagnostics.Stopwatch watch = System.Diagnostics.Stopwatch.StartNew();
 
         public Application()
@@ -71,10 +70,10 @@ namespace Application
             if (fileName != null) // if everything is OK
             {
                 WindowLength.Enabled = true;
-                buttonWasClicked = true;
+                buttonOpenFileClicked = true;
                 string[] lines = File.ReadAllLines(fileName);
                 DrawGraphs dg = new DrawGraphs();
-                dg.Graphs(Fs, PressureNumber, lines, EKGchart, PressureChart1, PressureChart2, SamplesToAnalise,
+                dg.Graphs(Fs, PressureSamples, lines, EKGchart, PressureChart1, PressureChart2, SamplesToAnalise, PressureSamples,
                 time, amplitude, Window, Pressure1, timeP1, Pressure2, timeP2);
 
             }
@@ -117,12 +116,12 @@ namespace Application
 
             //PILLOW I
             //nowe Z KOLUMNAMI
-            /*for (int i = 1; i <= PressureNumber; i++)
+            /*for (int i = 1; i <= PressureSamples; i++)
             {
                 string[] column = lines[i].Split(' ', '\t');
                 Pressure1[i] = Double.Parse(column[1]);
                 Pressure1[0] = Pressure1[1];
-                double Ts = Math.Round(time[SamplesToAnalise - 1]) / PressureNumber;
+                double Ts = Math.Round(time[SamplesToAnalise - 1]) / PressureSamples;
 
                 timeP1[0] = 0;
                 timeP1[i] = i * Ts;
@@ -134,17 +133,17 @@ namespace Application
             chartP.AxisY.Minimum = 0;
             chartP.AxisY.Maximum = 20;
             chartP.AxisX.Minimum = 0;
-            chartP.AxisX.Maximum = Math.Round(timeP1[PressureNumber]);
+            chartP.AxisX.Maximum = Math.Round(timeP1[PressureSamples]);
             chartP.AxisX.Interval = 1;
             chartP.AxisX.IntervalOffset = 0;
             chartP.AxisX.ScaleView.Zoom(0, 11);
             chartP.AxisX.LabelStyle.Format = "#";
-            Console.WriteLine("imeP1[PressureNumber] " + timeP1[PressureNumber-1]);
+            Console.WriteLine("imeP1[PressureSamples] " + timeP1[PressureSamples-1]);
             chartP.AxisX.ScrollBar.ButtonStyle = ScrollBarButtonStyles.SmallScroll;
             chartP.AxisX.ScaleView.SmallScrollSize = 5;
             PressureChart1.Series[0].ChartType = SeriesChartType.FastLine;
             
-            for (int i = 0; i <= PressureNumber; i++)
+            for (int i = 0; i <= PressureSamples; i++)
             {
                 PressureChart1.Series["Pressure1"].Points.AddXY(timeP1[i], Pressure1[i]);
                 if (timeP1[i] % Window == 0)
@@ -156,12 +155,12 @@ namespace Application
 
             //PILLOW II
             //nowe Z KOLUMNAMI
-            /*   for (int i = 1; i <= PressureNumber; i++)
+            /*   for (int i = 1; i <= PressureSamples; i++)
                {
                    string[] column = lines[i].Split(' ', '\t');
                    Pressure2[i] = Double.Parse(column[2]);
                    Pressure2[0] = Pressure2[1];
-                   double Ts = Math.Round(time[SamplesToAnalise - 1]) / PressureNumber;
+                   double Ts = Math.Round(time[SamplesToAnalise - 1]) / PressureSamples;
 
                    timeP2[0] = 0;
                    timeP2[i] = i * Ts;
@@ -173,7 +172,7 @@ namespace Application
                chartP2.AxisY.Maximum = 20;
                chartP2.AxisX.Minimum = 0;
                chartP2.AxisX.Interval = 5;
-               chartP2.AxisX.Maximum = Math.Round(timeP2[PressureNumber]);
+               chartP2.AxisX.Maximum = Math.Round(timeP2[PressureSamples]);
 
                chartP2.AxisX.Interval = 1;
                chartP2.AxisX.IntervalOffset = 0;
@@ -185,7 +184,7 @@ namespace Application
 
                PressureChart2.Series[0].ChartType = SeriesChartType.FastLine;
 
-               for (int i = 0; i <= PressureNumber; i++)
+               for (int i = 0; i <= PressureSamples; i++)
                {
                    PressureChart2.Series["Pressure1"].Points.AddXY(timeP2[i], Pressure2[i]);
                    if (timeP2[i] % Window == 0)
@@ -197,7 +196,7 @@ namespace Application
         private void Start_Click(object sender, EventArgs e)
         {
             buttonAnaliseClicked = true;
-            if (buttonWasClicked == false)
+            if (buttonOpenFileClicked == false)
             {
                 MessageBox.Show("Najpierw wybierz folder");
             }
@@ -205,7 +204,7 @@ namespace Application
             {
                 MessageBox.Show("Wybrana wartoœæ okna czasowego jest nieprawid³owa");
             }
-            if (buttonWasClicked && Window <= SamplesToAnalise / Fs)
+            if (buttonOpenFileClicked && Window <= SamplesToAnalise / Fs)
             {
                 PressureChart3.Series["Pressure1"].Points.Clear();
                 chart4.Series["Pressure1"].Points.Clear();
@@ -218,18 +217,18 @@ namespace Application
 
 
                   Pillows pillow = new Pillows();
-                    resultsPillow1 = pillow.checkPillow(Pressure1, timeP1, SamplesToAnalise, Fs, Window);
+                    resultsPillow1 = pillow.checkPillow(Pressure1, timeP1, PressureSamples, Fs, Window);
                     foreach (double n in resultsPillow1) {
                         Console.WriteLine(" pillow1: " + n);
                     }
-                    resultsPillow2 = pillow.checkPillow(Pressure2, timeP2, SamplesToAnalise, Fs, Window);
+                    resultsPillow2 = pillow.checkPillow(Pressure2, timeP2, PressureSamples, Fs, Window);
                     foreach (double n in resultsPillow2)
                     {
                         Console.WriteLine(" pillow 2: " + n);
                     }
                     
                 PanTompkins PanT = new PanTompkins();
-                resultsECG = PanT.PanTompkinsAlgorithm(amplitude, Fs, time, SamplesToAnalise, this.EKGchart, PressureChart2, PressureChart3, chart4, Window, listView1);
+                resultsECG = PanT.PanTompkinsAlgorithm(amplitude, Fs, time, SamplesToAnalise, EKGchart, PressureChart2, PressureChart3, chart4, Window, listView1);
                 foreach (double n in resultsECG)
                 {
                     Console.WriteLine(" resultsECG: " + n);
@@ -240,48 +239,39 @@ namespace Application
         }
 
         private void WindowLength_SelectedIndexChanged(object sender, EventArgs e)
-        {
+        { 
+        
                 Window = int.Parse(WindowLength.SelectedItem.ToString());
                 EKGchart.Annotations.Clear();
                 PressureChart1.Annotations.Clear();
                 PressureChart2.Annotations.Clear();
-
+                DrawGraphs dg = new DrawGraphs();
                 for (int i = 0; i < SamplesToAnalise; i++)
                 {
                     if (time[i] % Window == 0)
                     {
-                        VerticalLine(EKGchart, i);
+                        dg.VerticalLine(EKGchart, i, time);
+                        dg.VerticalLine(PressureChart1, i, timeP1);
+                        dg.VerticalLine(PressureChart2, i, timeP2);
+
+                   /* VerticalLine(EKGchart, i);
                         VerticalLine(PressureChart1, i);
-                        VerticalLine(PressureChart2, i);
+                        VerticalLine(PressureChart2, i);*/
+                    }
                 }
-            }
-        }
-        public void VerticalLine(Chart chart, int x)
-        {
-            VA = new VerticalLineAnnotation();
-            VA.AxisX = chart.ChartAreas[0].AxisX;
-            VA.AllowMoving = false;
-            VA.Visible = true;
-            VA.AnchorOffsetX = 0;
-            VA.IsInfinitive = true;
-            VA.LineColor = Color.BlueViolet;
-            VA.LineWidth = 1;
-            VA.X = time[x];
-            chart.Annotations.Add(VA);
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void saveButton_Click(object sender, EventArgs e)
         {
-            if (buttonWasClicked == false) MessageBox.Show("Wybierz plik do analizy");
-            else if (buttonAnaliseClicked == false && buttonWasClicked == true) MessageBox.Show("Najpierw rozpocznij analizê");
-            else if (buttonAnaliseClicked == true && buttonWasClicked == true)
+            if (buttonOpenFileClicked == false) MessageBox.Show("Wybierz plik do analizy");
+            else if (buttonAnaliseClicked == false && buttonOpenFileClicked == true) MessageBox.Show("Najpierw rozpocznij analizê");
+            else if (buttonAnaliseClicked == true && buttonOpenFileClicked == true)
             {
                 SaveResults sr = new SaveResults();
                 EKGchart.ChartAreas[0].AxisX.ScaleView.ZoomReset();
                 sr.Save(listView1, EKGchart);
                 EKGchart.ChartAreas[0].AxisX.ScaleView.Zoom(0, 11);
             }
-            
         }
     } 
 }
