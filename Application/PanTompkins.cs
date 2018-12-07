@@ -22,46 +22,39 @@ namespace Application
         List<double> resultsHR = new List<double>();
         double HeartRate;
 
-        public List<double> PanTompkinsAlgorithm(double[] indata, double sampleRate, double[] time, int SamplesToAnalise, Chart EKGchart, 
-            Chart PressureChart2, Chart PressureChart3, Chart chart4, int WindowLength, ListView listView1)
+        public List<double> PanTompkinsAlgorithm(List<double> inputdata, double sampleRate, List<double> intime, int SamplesToAnalise, Chart EKGchart, 
+                int WindowLength, ListView listView1)
         {
             double[] lowFilter = new double[SamplesToAnalise + 5];            
             double[] highFilter = new double[SamplesToAnalise + 5];
+            double[] indata = inputdata.ToArray();
+            double[] time = intime.ToArray();
 
             // FILTERING
             BandPassFilter bf = new BandPassFilter();
-            lowFilter = bf.Filter(indata, sampleRate, "LOW");          
+            lowFilter = bf.Filter(indata, sampleRate, "LOW");              
             highFilter = bf.Filter(lowFilter, sampleRate, "HIGH");
-
             // DERIVATIVE
-            double[] derivative = new double[SamplesToAnalise + 5];
+            double[] derivative = new double[SamplesToAnalise];
 
-            for (int i = 0; i < SamplesToAnalise; i++)
+            for (int i = 0; i < SamplesToAnalise - 1; i++)
             {
                 derivative[i] = (highFilter[i + 1] - highFilter[i]) / (time[i + 1] - time[i]);
             }
-           /* PressureChart1.Titles["Title1"].Text = "derivative";
-            PressureChart1.ChartAreas[0].AxisX.Minimum = 0;
-            PressureChart1.ChartAreas[0].AxisX.Interval = 5;
-            PressureChart1.ChartAreas[0].AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
-            for (int i = 0; i < SamplesToAnalise; i++)
-            {
-                PressureChart1.Series["Pressure1"].Points.AddXY(time[i], derivative[i]);
-            }*/
             // SQUARING
             double[] square = new double[SamplesToAnalise + 500];
-            for (int i = 0; i < SamplesToAnalise; i++)
+            for (int i = 0; i < SamplesToAnalise -1; i++)
             {
                 square[i] = derivative[i] * derivative[i];
             }
-          /*  PressureChart2.Titles["Title1"].Text = "SQUARE";
-            PressureChart2.ChartAreas[0].AxisX.Minimum = 0;
-            PressureChart2.ChartAreas[0].AxisX.Interval = 5;
-            PressureChart2.ChartAreas[0].AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
-            for (int i = 0; i < SamplesToAnalise; i++)
-            {
-                PressureChart2.Series["Pressure1"].Points.AddXY(time[i], square[i]);
-            }*/
+            /*  PressureChart2.Titles["Title1"].Text = "SQUARE";
+              PressureChart2.ChartAreas[0].AxisX.Minimum = 0;
+              PressureChart2.ChartAreas[0].AxisX.Interval = 5;
+              PressureChart2.ChartAreas[0].AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
+              for (int i = 0; i < SamplesToAnalise; i++)
+              {
+                  PressureChart2.Series["Pressure1"].Points.AddXY(time[i], square[i]);
+              }*/
             //MOVING AVERAGE FILTER
             double[] average = new double[SamplesToAnalise + 5];
             int movingAverageFilter = 0;
@@ -81,11 +74,12 @@ namespace Application
             }
             
             // FIRST PEAK
-            int Samples = 0;
+           /* int Samples = 0;
             if (sampleRate == 100) Samples = 100;
             else if (sampleRate == 400 || sampleRate == 360) Samples = 380;
             else if (sampleRate == 4500) Samples = 4300;
-            else Samples = 200;
+            else Samples = 200;*/
+            int Samples = (int)(sampleRate * 0.95);
             double[] firstSamples = new double[Samples];
             for (int i = 0; i < Samples; i++)   
             {
@@ -218,13 +212,6 @@ namespace Application
                {
                    if (average[i] == K)
                    {
-                        
-                        chart4.Titles["Title1"].Text = "PEAK";
-                        chart4.ChartAreas[0].AxisX.Minimum = 0;
-                        chart4.ChartAreas[0].AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
-                        chart4.ChartAreas[0].AxisX.Interval = 5;
-                        chart4.Series["Pressure1"].Color = Color.Brown;
-                        chart4.Series["Pressure1"].Points.AddXY(time[i], K); //AboveThreshold[i]
                         EKGchart.Series["Peaks"].ChartType = SeriesChartType.FastPoint;
                         EKGchart.Series["Peaks"].Points.AddXY(time[i], indata[i]);
                     }
@@ -237,13 +224,13 @@ namespace Application
             double RoundWindow = Math.Floor(numberOfWindows);//Math.Round(numberOfWindows);
             for (int i = 0; i < RoundWindow; i++)
             {
-                resultsHR.Add(CalculateHeartRate(WindowLength, RTime, ListOfPeaks, sampleRate, x, y, listView1, error, RtooHigh_Low));
+                resultsHR.Add(CalculateHeartRate(WindowLength, RTime, ListOfPeaks, x, y, listView1, error, RtooHigh_Low));
                 y++;
                 x++;
             }
             return resultsHR;
         }
-        private double CalculateHeartRate(int WindowLength, List<double> RTime, List<double> ListOfPeaks, double sampleRate, int x, int y, ListView listView1, List<double> error, List<double> RtooHigh_Low)
+        private double CalculateHeartRate(int WindowLength, List<double> RTime, List<double> ListOfPeaks, int x, int y, ListView listView1, List<double> error, List<double> RtooHigh_Low)
         {            
             int R = 0;
             int Rerror = 0;

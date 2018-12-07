@@ -13,7 +13,7 @@ namespace Application
     {
         List<double> resultsSD = new List<double>();
 
-        public List<double> checkPillow(double[] Pressure, double[] timeP, int SamplesToAnalise, double Fs, int Window)
+        public List<double> checkPillow(List<double> Pressure, List<double> timeP, int SamplesToAnalise, double Fs, int Window)
         {           
             int y = 0;
             int x = 1;
@@ -29,21 +29,17 @@ namespace Application
             return resultsSD;
         }
 
-        private double standardDeviation(double[] Pressure, double[] timeP, int Window, int x, int y) 
+        private double standardDeviation(List<double> Pressure, List<double> timeP, int Window, int x, int y) 
         {
-           // double value = 0; // arytmeycna
             double MeanValue = 10;
             double sum = 0;
             double sd = 0;
-            //int sampleRate = 10;
             List<double> standardD = new List<double>();
 
-            for (int i = Array.FindIndex(timeP, w => w == y * Window); i <= Array.FindIndex(timeP, w => w == x * Window); i=i+50)
+            for (int i = timeP.FindIndex(w => w == y * Window); i <= timeP.FindIndex(w => w == x * Window); i=i+50)
             {
                 standardD.Add(Pressure[i]);
-               // value = value + Pressure[i];
             }
-           // MeanValue = value / standardD.Count();
             sum = standardD.Select(w => (w - MeanValue) * (w - MeanValue)).Sum();
             sd = Math.Sqrt(sum / (standardD.Count() - 1));
             return sd;

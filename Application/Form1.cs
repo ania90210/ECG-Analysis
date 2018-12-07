@@ -17,17 +17,20 @@ namespace Application
     {
         bool buttonOpenFileClicked = false;
         bool buttonAnaliseClicked = false;
+        static int NumberOfLines = 45000; //1000 //8000/ 20000 /21600 /45000 ;
         static int SamplesToAnalise = 45000; //1000 //8000/ 20000 /21600 /45000 ;
         static int PressureSamples = 45000; //120 /100
-        double[] time = new double[SamplesToAnalise + 5];
-        double[] amplitude = new double[SamplesToAnalise + 5];
-        double Fs = 4500;//100//400//4500 //360;  
+        double Fs;//100//400//4500 //360;  
         int Window = 5;
-        double[] Pressure1 = new double[PressureSamples + 5];
-        double[] timeP1 = new double[PressureSamples + 5];
 
-        double[] Pressure2 = new double[PressureSamples + 5];
-        double[] timeP2 = new double[PressureSamples + 5];
+        List<double> time = new List<double>();
+        List<double> amplitude = new List<double>();
+
+        List<double> Pressure1 = new List<double>();
+        List<double> timeP1 = new List<double>();
+
+        List<double> Pressure2 = new List<double>();
+        List<double> timeP2 = new List<double>();
 
         public Application()
         {
@@ -45,35 +48,40 @@ namespace Application
             using (OpenFileDialog ofd = new OpenFileDialog())
             {
                 ofd.Title = "Wybierz plik do analizy";
-                ofd.InitialDirectory = "C:\\Users\\Ania\\Desktop\\Inzynierka";//Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                ofd.InitialDirectory = "C:\\Users\\Ania\\Desktop\\Inzynierka\\dane";//Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
                 ofd.Filter = "TXT (*.txt)|*.txt";
                 ofd.RestoreDirectory = true;
 
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
                     fileName = ofd.FileName;
-                    EKGchart.Series["EKG"].Points.Clear(); // clear chart
+                    EKGchart.Series["EKG"].Points.Clear(); 
                     EKGchart.Series["Peaks"].Points.Clear();
-                    PressureChart1.Series["Pressure1"].Points.Clear(); // clear chart
-                    PressureChart2.Series["Pressure1"].Points.Clear(); // clear chart
+                    PressureChart1.Series["Pressure1"].Points.Clear(); 
+                    PressureChart2.Series["Pressure1"].Points.Clear(); 
                     listView1.Items.Clear();
                     string line1 = File.ReadLines(fileName).First();
-                    if (line1 != "eKrzeslo")
+                    string[] column = line1.Split(',', ' ');
+                    if (column[0] != "eKrzeslo") // lub physionet
                     {
                         fileName = null;
                         MessageBox.Show("Wybrano nieprawid³owy plik");
                     }
+                    else if (column[0] == "eKrzeslo") Fs = Double.Parse(column[1]);                
                 }
             }
-
-            if (fileName != null) // if everything is OK
+            if (fileName != null) 
             {
                 WindowLength.Enabled = true;
                 buttonOpenFileClicked = true;
                 string[] lines = File.ReadAllLines(fileName);
+                int lineNumber = File.ReadAllLines(fileName).Count();
+                NumberOfLines = lineNumber - 1;
+              //  SamplesToAnalise = NumberOfLines;
+                Console.WriteLine("NumberOfLines " + NumberOfLines + "samples : " + SamplesToAnalise);
                 DrawGraphs dg = new DrawGraphs();
                 dg.Graphs(Fs, PressureSamples, lines, EKGchart, PressureChart1, PressureChart2, SamplesToAnalise, PressureSamples,
-                time, amplitude, Window, Pressure1, timeP1, Pressure2, timeP2);
+                time, amplitude, Window, Pressure1, timeP1, Pressure2, timeP2, lineNumber);
                 buttonAnaliseClicked = false;
             }
         }
@@ -90,8 +98,6 @@ namespace Application
             }
             if (buttonOpenFileClicked && Window <= SamplesToAnalise / Fs)
             {
-                PressureChart3.Series["Pressure1"].Points.Clear();
-                chart4.Series["Pressure1"].Points.Clear();
                 listView1.Items.Clear();
 
                 List<double> resultsPillow1 = new List<double>();
@@ -109,8 +115,8 @@ namespace Application
                         Console.WriteLine(" pillow 2: " + n);
                     }
                     
-                PanTompkins PanT = new PanTompkins();
-                resultsECG = PanT.PanTompkinsAlgorithm(amplitude, Fs, time, SamplesToAnalise, EKGchart, PressureChart2, PressureChart3, chart4, Window, listView1);
+                PanTompkins PT = new PanTompkins();
+                resultsECG = PT.PanTompkinsAlgorithm(amplitude, Fs, time, SamplesToAnalise, EKGchart, Window, listView1);
                 foreach (double n in resultsECG)
                 {
                     Console.WriteLine(" resultsECG: " + n);
@@ -123,7 +129,6 @@ namespace Application
 
         private void WindowLength_SelectedIndexChanged(object sender, EventArgs e)
         { 
-        
                 Window = int.Parse(WindowLength.SelectedItem.ToString());
                 EKGchart.Annotations.Clear();
                 PressureChart1.Annotations.Clear();

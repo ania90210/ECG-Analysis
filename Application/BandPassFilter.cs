@@ -8,7 +8,7 @@ namespace Application
 {
     class BandPassFilter
     {
-        public double[] Filter(double[] indata, double sampleRate, string HL)
+        public double[] Filter(double[] indata, double sampleRate, string filter)
         {
             double[] error = { };
             long dF2 = indata.Length - 1;        // The data range is set with dF2
@@ -31,9 +31,9 @@ namespace Application
             DatH[1] = DatH[0] = indata[0];
 
             // LOW FILTER
-            if (HL == "LOW")
+            if (filter == "LOW")
             {
-                double cN = 1 / Math.Tan(Math.PI * 12 / sampleRate);
+                double cN = 1 / Math.Tan(Math.PI * 15 / sampleRate);
                 double a1N = 1.0 / (1.0 + Math.Sqrt(2) * cN + cN * cN);
                 double a2N = 2 * a1N;
                 double a3N = a1N;
@@ -55,9 +55,9 @@ namespace Application
 
 
             //HIGH FILTER 
-            if (HL == "HIGH")
+            if (filter == "HIGH")
             {
-                double cNH = Math.Tan(Math.PI * 7 / sampleRate);
+                double cNH = Math.Tan(Math.PI * 5 / sampleRate);
                 double a1NH = 1.0 / (1.0 + Math.Sqrt(2) * cNH + cNH * cNH);
                 double a2NH = -2 * a1NH;
                 double a3NH = a1NH;

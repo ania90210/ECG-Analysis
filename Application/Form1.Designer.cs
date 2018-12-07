@@ -46,20 +46,12 @@ namespace Application
             System.Windows.Forms.DataVisualization.Charting.Title title7 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataVisualization.Charting.Title title8 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataVisualization.Charting.Title title9 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Title title10 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea5 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series6 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Title title11 = new System.Windows.Forms.DataVisualization.Charting.Title();
             this.EKGchart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.PressureChart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.OpenFileButton = new System.Windows.Forms.Button();
             this.WindowLength = new System.Windows.Forms.ComboBox();
             this.PressureChart2 = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.PressureChart3 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.Start = new System.Windows.Forms.Button();
-            this.chart4 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.listView1 = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -69,8 +61,6 @@ namespace Application
             ((System.ComponentModel.ISupportInitialize)(this.EKGchart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.PressureChart1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.PressureChart2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.PressureChart3)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chart4)).BeginInit();
             this.SuspendLayout();
             // 
             // EKGchart
@@ -260,29 +250,6 @@ namespace Application
             this.PressureChart2.Titles.Add(title8);
             this.PressureChart2.Titles.Add(title9);
             // 
-            // PressureChart3
-            // 
-            this.PressureChart3.BackColor = System.Drawing.Color.DarkGray;
-            this.PressureChart3.BackGradientStyle = System.Windows.Forms.DataVisualization.Charting.GradientStyle.TopBottom;
-            this.PressureChart3.BackSecondaryColor = System.Drawing.Color.Gainsboro;
-            this.PressureChart3.BorderlineColor = System.Drawing.Color.DarkGray;
-            this.PressureChart3.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
-            chartArea4.BackColor = System.Drawing.Color.WhiteSmoke;
-            chartArea4.Name = "ChartArea1";
-            this.PressureChart3.ChartAreas.Add(chartArea4);
-            this.PressureChart3.Location = new System.Drawing.Point(1374, 323);
-            this.PressureChart3.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.PressureChart3.Name = "PressureChart3";
-            series5.ChartArea = "ChartArea1";
-            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series5.Name = "Pressure1";
-            this.PressureChart3.Series.Add(series5);
-            this.PressureChart3.Size = new System.Drawing.Size(599, 242);
-            this.PressureChart3.TabIndex = 8;
-            this.PressureChart3.Text = "chart1";
-            title10.Name = "Title1";
-            this.PressureChart3.Titles.Add(title10);
-            // 
             // Start
             // 
             this.Start.BackColor = System.Drawing.Color.PaleTurquoise;
@@ -297,29 +264,6 @@ namespace Application
             this.Start.UseVisualStyleBackColor = false;
             this.Start.Click += new System.EventHandler(this.Start_Click);
             // 
-            // chart4
-            // 
-            this.chart4.BackColor = System.Drawing.Color.DarkGray;
-            this.chart4.BackGradientStyle = System.Windows.Forms.DataVisualization.Charting.GradientStyle.TopBottom;
-            this.chart4.BackSecondaryColor = System.Drawing.Color.Gainsboro;
-            this.chart4.BorderlineColor = System.Drawing.Color.DarkGray;
-            this.chart4.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
-            chartArea5.BackColor = System.Drawing.Color.WhiteSmoke;
-            chartArea5.Name = "ChartArea1";
-            this.chart4.ChartAreas.Add(chartArea5);
-            this.chart4.Location = new System.Drawing.Point(1374, 478);
-            this.chart4.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.chart4.Name = "chart4";
-            series6.ChartArea = "ChartArea1";
-            series6.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
-            series6.Name = "Pressure1";
-            this.chart4.Series.Add(series6);
-            this.chart4.Size = new System.Drawing.Size(599, 242);
-            this.chart4.TabIndex = 12;
-            this.chart4.Text = "chart1";
-            title11.Name = "Title1";
-            this.chart4.Titles.Add(title11);
-            // 
             // listView1
             // 
             this.listView1.BackColor = System.Drawing.Color.WhiteSmoke;
@@ -330,10 +274,10 @@ namespace Application
             this.listView1.Font = new System.Drawing.Font("Arial", 10.8F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.listView1.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.listView1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-            this.listView1.Location = new System.Drawing.Point(1364, 171);
+            this.listView1.Location = new System.Drawing.Point(1378, 148);
             this.listView1.Margin = new System.Windows.Forms.Padding(3, 25, 3, 25);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(609, 368);
+            this.listView1.Size = new System.Drawing.Size(609, 590);
             this.listView1.TabIndex = 13;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
@@ -390,9 +334,7 @@ namespace Application
             this.Controls.Add(this.saveButton);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.listView1);
-            this.Controls.Add(this.chart4);
             this.Controls.Add(this.Start);
-            this.Controls.Add(this.PressureChart3);
             this.Controls.Add(this.PressureChart2);
             this.Controls.Add(this.WindowLength);
             this.Controls.Add(this.OpenFileButton);
@@ -406,8 +348,6 @@ namespace Application
             ((System.ComponentModel.ISupportInitialize)(this.EKGchart)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.PressureChart1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.PressureChart2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.PressureChart3)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chart4)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -419,9 +359,7 @@ namespace Application
         private System.Windows.Forms.Button OpenFileButton;
         private System.Windows.Forms.ComboBox WindowLength;
         private System.Windows.Forms.DataVisualization.Charting.Chart PressureChart2;
-        private System.Windows.Forms.DataVisualization.Charting.Chart PressureChart3;
         private System.Windows.Forms.Button Start;
-        private System.Windows.Forms.DataVisualization.Charting.Chart chart4;
         private System.Windows.Forms.ListView listView1;
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.ColumnHeader columnHeader2;

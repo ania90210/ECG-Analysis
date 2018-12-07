@@ -11,19 +11,20 @@ namespace Application
     class DrawGraphs
     {
         public void Graphs(double Fs, int PressureNumber, string[] lines, Chart EKGchart, Chart PressureChart1, Chart PressureChart2, int SamplesToAnalise, 
-            int PressureSamples, double[] time, double[] amplitude, int Window, double[] Pressure1, double[] timeP1, double[] Pressure2, double[] timeP2)
+            int PressureSamples, List<double> time, List<double> amplitude, int Window, List<double> Pressure1, List<double> timeP1, List<double> Pressure2, List<double> timeP2, int lineNumber)
         {
             for (int i = 1; i <= SamplesToAnalise; i++)
             {
                 lines[i] = lines[i].Replace('.', ',');
                 string[] column = lines[i].Split(' ', '\t');
 
-                amplitude[i - 1] = Double.Parse(column[0]);
+                amplitude.Add(Double.Parse(column[0]));
 
                 double Ts = 1 / Fs;
-                time[i - 1] = (i - 1) * Ts;
-                time[SamplesToAnalise - 1] = Math.Round(time[SamplesToAnalise - 1]);
+                if(i!=SamplesToAnalise) time.Add((i - 1) * Ts);
+                else time.Add(Math.Round(time[SamplesToAnalise - 2]));
             }
+            Console.WriteLine("time COUNT " + time.Count);
             // EKG chart
             var chart = EKGchart.ChartAreas[0];
             chart.AxisX.Minimum = 0;
@@ -49,11 +50,11 @@ namespace Application
             for (int i = 1; i <= PressureSamples; i++)
             {
                 string[] column = lines[i].Split(' ', '\t');
-                Pressure1[i - 1] = Double.Parse(column[1]);
+                Pressure1.Add( Double.Parse(column[1]));
 
                 double Ts = 1/Fs;
-                timeP1[i - 1] = (i - 1) * Ts;
-                timeP1[PressureSamples - 1] = Math.Round(timeP1[PressureSamples - 1]);
+                if(i!= PressureSamples) timeP1.Add((i - 1) * Ts);
+                else timeP1.Add(Math.Round(timeP1[PressureSamples - 2]));
                 /*
                 Pressure1[i] = Double.Parse(column[1]);
                 Pressure1[0] = Pressure1[1];
@@ -92,11 +93,11 @@ namespace Application
             for (int i = 1; i <= PressureSamples; i++)
             {
                 string[] column = lines[i].Split(' ', '\t');
-                Pressure2[i - 1] = Double.Parse(column[2]);
+                Pressure2.Add(Double.Parse(column[2]));
 
                 double Ts = 1 / Fs;
-                timeP2[i - 1] = (i - 1) * Ts;
-                timeP2[PressureSamples - 1] = Math.Round(timeP2[PressureSamples - 1]);
+                if (i != PressureSamples) timeP2.Add((i - 1) * Ts);
+                else timeP2.Add(Math.Round(timeP2[PressureSamples - 2]));
 
             }
 
@@ -125,9 +126,8 @@ namespace Application
             }
         }
 
-        public void VerticalLine(Chart chart, int x, double[] time)
+        public void VerticalLine(Chart chart, int x, List<double> time)
         {
-
             VerticalLineAnnotation VA = new VerticalLineAnnotation();
             VA.AxisX = chart.ChartAreas[0].AxisX;
             VA.AllowMoving = false;
