@@ -29,14 +29,16 @@ namespace Application
             return resultsSD;
         }
 
-        private double standardDeviation(List<double> Pressure, List<double> timeP, int Window, int x, int y) 
+        private double standardDeviation(List<double> PressureP, List<double> timeP, int Window, int x, int y) 
         {
             double MeanValue = 10;
             double sum = 0;
             double sd = 0;
             List<double> standardD = new List<double>();
+            double[] Pressure = PressureP.ToArray();
+            double[] time = timeP.ToArray();
 
-            for (int i = timeP.FindIndex(w => w == y * Window); i <= timeP.FindIndex(w => w == x * Window); i=i+50)
+            for (int i = Array.FindIndex(time, w => w == y * Window); i <= Array.FindIndex(time, w => w == x * Window); i=i+50)
             {
                 standardD.Add(Pressure[i]);
             }

@@ -10,20 +10,27 @@ namespace Application
 {
     class DrawGraphs
     {
-        public void Graphs(double Fs, int PressureNumber, string[] lines, Chart EKGchart, Chart PressureChart1, Chart PressureChart2, int SamplesToAnalise, 
-            int PressureSamples, List<double> time, List<double> amplitude, int Window, List<double> Pressure1, List<double> timeP1, List<double> Pressure2, List<double> timeP2, int lineNumber)
+        string[] column;
+        public void Graphs(double Fs, string[] lines, Chart EKGchart, Chart PressureChart1, Chart PressureChart2, int SamplesToAnalise, 
+            int PressureSamples, List<double> time, List<double> amplitude, int Window, List<double> Pressure1, List<double> timeP1, 
+            List<double> Pressure2, List<double> timeP2, int lineNumber, bool eChair, bool PhysioNet)
         {
-            for (int i = 1; i <= SamplesToAnalise; i++)
+            double Ts = 1 / Fs;
+
+            for (int i = 0; i < SamplesToAnalise; i++)
             {
                 lines[i] = lines[i].Replace('.', ',');
-                string[] column = lines[i].Split(' ', '\t');
+                column = lines[i].Split(' ', '\t');
 
-                amplitude.Add(Double.Parse(column[0]));
+               if(eChair) amplitude.Add(Double.Parse(column[0]));
+               else if(PhysioNet) amplitude.Add(Double.Parse(column[1]));
 
-                double Ts = 1 / Fs;
-                if(i!=SamplesToAnalise) time.Add((i - 1) * Ts);
-                else time.Add(Math.Round(time[SamplesToAnalise - 2]));
+               if (i!=SamplesToAnalise-1) time.Add(i * Ts);
+               else time.Add(Math.Round(time[SamplesToAnalise - 2]));
+
             }
+            Console.WriteLine("time[SamplesToAnalise - 1] " + time[SamplesToAnalise - 1]);
+
             Console.WriteLine("time COUNT " + time.Count);
             // EKG chart
             var chart = EKGchart.ChartAreas[0];
@@ -46,82 +53,84 @@ namespace Application
                 }
             }
 
-            // PILLOW I
-            for (int i = 1; i <= PressureSamples; i++)
+            if (eChair)
             {
-                string[] column = lines[i].Split(' ', '\t');
-                Pressure1.Add( Double.Parse(column[1]));
-
-                double Ts = 1/Fs;
-                if(i!= PressureSamples) timeP1.Add((i - 1) * Ts);
-                else timeP1.Add(Math.Round(timeP1[PressureSamples - 2]));
-                /*
-                Pressure1[i] = Double.Parse(column[1]);
-                Pressure1[0] = Pressure1[1];
-                double Ts = Math.Round(time[SamplesToAnalise - 1]) / PressureNumber;
-
-                timeP1[0] = 0;
-                timeP1[i] = i * Ts;*/
-
-            }
-
-            var chartP = PressureChart1.ChartAreas[0];
-            PressureChart1.Series["Pressure1"].Color = Color.Blue;
-            chartP.AxisY.Minimum = 0;
-            chartP.AxisY.Maximum = 20;
-            chartP.AxisX.Minimum = 0;
-            chartP.AxisX.Maximum = Math.Round(timeP1[PressureSamples - 1]);
-            chartP.AxisX.Interval = 1;
-            chartP.AxisX.IntervalOffset = 0;
-            chartP.AxisX.ScaleView.Zoom(0, 11);
-            chartP.AxisX.LabelStyle.Format = "#";
-            chartP.AxisX.ScrollBar.ButtonStyle = ScrollBarButtonStyles.SmallScroll;
-            chartP.AxisX.ScaleView.SmallScrollSize = 5;
-            PressureChart1.Series[0].ChartType = SeriesChartType.FastLine;
-
-            for (int i = 0; i < PressureSamples; i++)
-            {
-                PressureChart1.Series["Pressure1"].Points.AddXY(timeP1[i], Pressure1[i]);
-                if (timeP1[i] % Window == 0)
+                // PILLOW I
+                for (int i = 0; i < PressureSamples; i++)
                 {
-                    VerticalLine(PressureChart1, i, timeP1);
+                    lines[i] = lines[i].Replace('.', ',');
+                    column = lines[i].Split(' ', '\t');
+
+                    Pressure1.Add(Double.Parse(column[1]));
+                    if (i != PressureSamples-1) timeP1.Add(i* Ts);
+                    else timeP1.Add(Math.Round(timeP1[PressureSamples - 2]));
+                    /*
+                    Pressure1[i] = Double.Parse(column[1]);
+                    Pressure1[0] = Pressure1[1];
+                    double Ts = Math.Round(time[SamplesToAnalise - 1]) / PressureNumber;
+
+                    timeP1[0] = 0;
+                    timeP1[i] = i * Ts;
+                    */
                 }
-            }
 
-            //PILLOW II
-            //nowe Z KOLUMNAMI
-            for (int i = 1; i <= PressureSamples; i++)
-            {
-                string[] column = lines[i].Split(' ', '\t');
-                Pressure2.Add(Double.Parse(column[2]));
+                var chartP = PressureChart1.ChartAreas[0];
+                PressureChart1.Series["Pressure1"].Color = Color.Blue;
+                chartP.AxisY.Minimum = 0;
+                chartP.AxisY.Maximum = 20;
+                chartP.AxisX.Minimum = 0;
+                chartP.AxisX.Maximum = Math.Round(timeP1[PressureSamples - 1]);
+                chartP.AxisX.Interval = 1;
+                chartP.AxisX.IntervalOffset = 0;
+                chartP.AxisX.ScaleView.Zoom(0, 11);
+                chartP.AxisX.LabelStyle.Format = "#";
+                chartP.AxisX.ScrollBar.ButtonStyle = ScrollBarButtonStyles.SmallScroll;
+                chartP.AxisX.ScaleView.SmallScrollSize = 5;
+                PressureChart1.Series[0].ChartType = SeriesChartType.FastLine;
 
-                double Ts = 1 / Fs;
-                if (i != PressureSamples) timeP2.Add((i - 1) * Ts);
-                else timeP2.Add(Math.Round(timeP2[PressureSamples - 2]));
-
-            }
-
-            var chartP2 = PressureChart2.ChartAreas[0];
-            PressureChart2.Series["Pressure1"].Color = Color.Blue;
-            chartP2.AxisY.Minimum = 0;
-            chartP2.AxisY.Maximum = 20;
-            chartP2.AxisX.Minimum = 0;
-            chartP2.AxisX.Interval = 5;
-            chartP2.AxisX.Maximum = Math.Round(timeP2[PressureSamples - 1]);
-            chartP2.AxisX.Interval = 1;
-            chartP2.AxisX.IntervalOffset = 0;
-            chartP2.AxisX.ScaleView.Zoom(0, 11);
-            chartP2.AxisX.LabelStyle.Format = "#";
-            chartP2.AxisX.ScrollBar.ButtonStyle = ScrollBarButtonStyles.SmallScroll;
-            chartP2.AxisX.ScaleView.SmallScrollSize = 5;
-            PressureChart2.Series[0].ChartType = SeriesChartType.FastLine;
-
-            for (int i = 0; i < PressureSamples; i++)
-            {
-                PressureChart2.Series["Pressure1"].Points.AddXY(timeP2[i], Pressure2[i]);
-                if (timeP2[i] % Window == 0)
+                for (int i = 0; i < PressureSamples; i++)
                 {
-                    VerticalLine(PressureChart2, i, timeP2);
+                    PressureChart1.Series["Pressure1"].Points.AddXY(timeP1[i], Pressure1[i]);
+                    if (timeP1[i] % Window == 0)
+                    {
+                        VerticalLine(PressureChart1, i, timeP1);
+                    }
+                }
+
+                //PILLOW II
+                //nowe Z KOLUMNAMI
+                for (int i = 0; i < PressureSamples; i++)
+                {
+                    lines[i] = lines[i].Replace('.', ',');
+                    column = lines[i].Split(' ', '\t');
+
+                    Pressure2.Add(Double.Parse(column[2]));
+                    if (i != PressureSamples - 1) timeP2.Add(i * Ts);
+                    else timeP2.Add(Math.Round(timeP2[PressureSamples - 2]));
+                }
+
+                var chartP2 = PressureChart2.ChartAreas[0];
+                PressureChart2.Series["Pressure1"].Color = Color.Blue;
+                chartP2.AxisY.Minimum = 0;
+                chartP2.AxisY.Maximum = 20;
+                chartP2.AxisX.Minimum = 0;
+                chartP2.AxisX.Interval = 5;
+                chartP2.AxisX.Maximum = Math.Round(timeP2[PressureSamples - 1]);
+                chartP2.AxisX.Interval = 1;
+                chartP2.AxisX.IntervalOffset = 0;
+                chartP2.AxisX.ScaleView.Zoom(0, 11);
+                chartP2.AxisX.LabelStyle.Format = "#";
+                chartP2.AxisX.ScrollBar.ButtonStyle = ScrollBarButtonStyles.SmallScroll;
+                chartP2.AxisX.ScaleView.SmallScrollSize = 5;
+                PressureChart2.Series[0].ChartType = SeriesChartType.FastLine;
+
+                for (int i = 0; i < PressureSamples; i++)
+                {
+                    PressureChart2.Series["Pressure1"].Points.AddXY(timeP2[i], Pressure2[i]);
+                    if (timeP2[i] % Window == 0)
+                    {
+                        VerticalLine(PressureChart2, i, timeP2);
+                    }
                 }
             }
         }
