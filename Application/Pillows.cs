@@ -11,10 +11,10 @@ namespace Application
 {
     class Pillows
     {
-        List<double> resultsSD = new List<double>();
-
         public List<double> checkPillow(List<double> Pressure, List<double> timeP, int SamplesToAnalise, double Fs, int Window)
-        {           
+        {
+            List<double> resultsSD = new List<double>();
+
             int y = 0;
             int x = 1;
             double numberOfWindows = (SamplesToAnalise / Fs) / Window;
@@ -35,12 +35,10 @@ namespace Application
             double sum = 0;
             double sd = 0;
             List<double> standardD = new List<double>();
-            double[] Pressure = PressureP.ToArray();
-            double[] time = timeP.ToArray();
 
-            for (int i = Array.FindIndex(time, w => w == y * Window); i <= Array.FindIndex(time, w => w == x * Window); i=i+50)
+            for (int i = timeP.FindIndex(w => w == y * Window); i <= timeP.FindIndex(w => w == x * Window); i=i+50)
             {
-                standardD.Add(Pressure[i]);
+                standardD.Add(PressureP[i]);
             }
             sum = standardD.Select(w => (w - MeanValue) * (w - MeanValue)).Sum();
             sd = Math.Sqrt(sum / (standardD.Count() - 1));

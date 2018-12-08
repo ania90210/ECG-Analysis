@@ -23,8 +23,9 @@ namespace Application
         double HeartRate;
 
         public List<double> PanTompkinsAlgorithm(List<double> inputdata, double sampleRate, List<double> intime, int SamplesToAnalise, Chart EKGchart, 
-                int WindowLength, ListView listView1)
+                int WindowLength, ListView listView1, Chart chart1)
         {
+            Console.WriteLine("sample rate: " +sampleRate);
             double[] lowFilter = new double[SamplesToAnalise + 5];            
             double[] highFilter = new double[SamplesToAnalise + 5];
             double[] indata = inputdata.ToArray();
@@ -58,10 +59,15 @@ namespace Application
             //MOVING AVERAGE FILTER
             double[] average = new double[SamplesToAnalise + 5];
             int movingAverageFilter = 0;
-            if (sampleRate == 100) movingAverageFilter = 12;
-            if (sampleRate == 400 || sampleRate == 360) movingAverageFilter = 100;
-            if (sampleRate == 4500) movingAverageFilter = 400; // z 300
-            else movingAverageFilter = 50;
+            if(sampleRate < 150) movingAverageFilter = 15;
+            else if (sampleRate >= 150 && sampleRate <= 300) movingAverageFilter = 40; // lub 180
+            else if (sampleRate < 500 && sampleRate > 300) movingAverageFilter = 100;
+            else if (sampleRate <= 1000 && sampleRate >= 500) movingAverageFilter = 200;
+            else if (sampleRate < 4000 && sampleRate > 1000) movingAverageFilter = 300;
+            else if (sampleRate >= 4500) movingAverageFilter = 400; // z 300
+            else movingAverageFilter = 500;
+            Console.WriteLine("movingAverageFilter" + movingAverageFilter);
+
             for (int j = movingAverageFilter-1; j < SamplesToAnalise + movingAverageFilter -1; j++) 
             {
                 double sum = 0;
@@ -72,14 +78,21 @@ namespace Application
 
                 average[j - (movingAverageFilter - 1)] = sum / movingAverageFilter;
             }
+            chart1.ChartAreas[0].AxisX.Minimum = 0;
+            chart1.ChartAreas[0].AxisX.Interval = 5;
+            chart1.ChartAreas[0].AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
+            for (int i = 0; i < SamplesToAnalise; i++)
+            {
+                chart1.Series["Pressure1"].Points.AddXY(time[i], average[i]);
+            }
             
-            // FIRST PEAK
-           /* int Samples = 0;
-            if (sampleRate == 100) Samples = 100;
-            else if (sampleRate == 400 || sampleRate == 360) Samples = 380;
-            else if (sampleRate == 4500) Samples = 4300;
-            else Samples = 200;*/
-            int Samples = (int)(sampleRate * 0.95);
+         // FIRST PEAK
+         /* int Samples = 0;
+          if (sampleRate == 100) Samples = 100;
+          else if (sampleRate == 400 || sampleRate == 360) Samples = 380;
+          else if (sampleRate == 4500) Samples = 4300;
+          else Samples = 200;*/
+         int Samples = (int)(sampleRate * 0.95);
             double[] firstSamples = new double[Samples];
             for (int i = 0; i < Samples; i++)   
             {
@@ -140,7 +153,7 @@ namespace Application
                     Console.WriteLine("za duzy r " + ListOfPeaks[i]);
                     RtooHigh_Low.Add(RTime[i]);
                 }
-                else if (ListOfPeaks[i] != 0 && ListOfPeaks[i] < maxValue * 0.4) // jezeli peak R jest za maly 0.3
+                else if (ListOfPeaks[i] != 0 && ListOfPeaks[i] < maxValue * 0.5) // jezeli peak R jest za maly 0.3
                 {
                     Console.WriteLine("za male r " + ListOfPeaks[i]);
                     RtooHigh_Low.Add(RTime[i]);
@@ -153,7 +166,7 @@ namespace Application
             double averageRTime = 0;
             int numberRdet = RTimeDetected.Count;
 
-            if (numberRdet > 2)
+            if (numberRdet > 4)
             {
                 for (int i = 0; i < 3; i++) // wez pierwsze 3 R
                 {
@@ -244,7 +257,7 @@ namespace Application
             }
             for (int i = 0; i < RtooHigh_Low.Count; i++) //+2
             {
-                if (RtooHigh_Low.Count != 0 && result != "noise" && RtooHigh_Low[i] >= y * WindowLength && RtooHigh_Low[i] < x * WindowLength)
+                if (RtooHigh_Low.Count > 2 && result != "noise" && RtooHigh_Low[i] >= y * WindowLength && RtooHigh_Low[i] < x * WindowLength) // !=0
                 {                    
                     result = "irregularity";
                     Rerror++;

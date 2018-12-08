@@ -20,7 +20,6 @@ namespace Application
         bool eChair = false;
         bool PhysioNet = false;
 
-        //static int NumberOfLines = 45000; //1000 //8000/ 20000 /21600 /45000 ;
         static int SamplesToAnalise; //1000 //8000/ 20000 /21600 /45000 ;
         static int PressureSamples; //120 /100
         double Fs;//100//400//4500 //360;  
@@ -51,7 +50,7 @@ namespace Application
             using (OpenFileDialog ofd = new OpenFileDialog())
             {
                 ofd.Title = "Wybierz plik do analizy";
-                ofd.InitialDirectory = "C:\\Users\\Ania\\Desktop\\Inzynierka\\dane";//Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                ofd.InitialDirectory = "C:\\Users\\Ania\\Desktop\\Inzynierka\\pliki";//Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
                 ofd.Filter = "TXT (*.txt)|*.txt";
                 ofd.RestoreDirectory = true;
 
@@ -59,11 +58,16 @@ namespace Application
                 {
                     amplitude.Clear();
                     time.Clear();
+                    Pressure2.Clear();
+                    timeP1.Clear();
+                    Pressure2.Clear();
+                    timeP2.Clear();
                     listView1.Items.Clear();
                     EKGchart.Series["EKG"].Points.Clear();
                     EKGchart.Series["Peaks"].Points.Clear();
                     PressureChart1.Series["Pressure1"].Points.Clear();
                     PressureChart2.Series["Pressure1"].Points.Clear();
+                    chart1.Series["Pressure1"].Points.Clear();
                     EKGchart.Annotations.Clear();
                     PressureChart1.Annotations.Clear();
                     PressureChart2.Annotations.Clear();
@@ -74,24 +78,21 @@ namespace Application
 
                     if (column[0] == "eKrzeslo" && column.Length == 2)
                     {
-                        EKGchart.Series["EKG"].Points.Clear();
-
                         eChair = true;
                         PhysioNet = false;
                         Fs = Double.Parse(column[1]); // bez column.Length == 2
-                        EKGchart.Series["EKG"].Points.Clear();
+                      //  EKGchart.Series["EKG"].Points.Clear();
 
                     }
                     else if (column[0] == "PhysioNet" && column.Length == 1)
                     {
-                        EKGchart.Series["EKG"].Points.Clear();
-
                         PhysioNet = true;
                         eChair = false;
                         string line3 = File.ReadLines(fileName).ElementAt(2);
                         string[] column1 = line3.Split(' ', '"');
                         Fs = 1 / Double.Parse(column1[0].Substring(1).Replace('.', ','));
-                        EKGchart.Series["EKG"].Points.Clear();
+                        EKGchart.Titles["Title2"].Text = "Amplituda [mV]";
+                       // EKGchart.Series["EKG"].Points.Clear();
                     }
 
                     else
@@ -104,8 +105,7 @@ namespace Application
             }
             if (fileName != null) 
             {               
-                
-
+               
                 WindowLength.Enabled = true;
                 buttonOpenFileClicked = true;
 
@@ -114,13 +114,14 @@ namespace Application
                 else if (PhysioNet) lines = lines.Skip(3).ToArray();
                 int lineNumber = lines.Count();
                 SamplesToAnalise = PressureSamples = lineNumber;
-                Console.WriteLine("SamplesToAnalise " + SamplesToAnalise);
+                Console.WriteLine("Fs " + Fs);
                 DrawGraphs dg = new DrawGraphs();
                 dg.Graphs(Fs, lines, EKGchart, PressureChart1, PressureChart2, SamplesToAnalise, PressureSamples,
                 time, amplitude, Window, Pressure1, timeP1, Pressure2, timeP2, lineNumber, eChair, PhysioNet);
                 buttonAnaliseClicked = false;
 
             }
+            Console.WriteLine("FILE OPEN echair i physionet: " + eChair + PhysioNet);
         }
         
         private void Start_Click(object sender, EventArgs e)
@@ -155,7 +156,7 @@ namespace Application
                     }
                 }
                 PanTompkins PT = new PanTompkins();
-                resultsECG = PT.PanTompkinsAlgorithm(amplitude, Fs, time, SamplesToAnalise, EKGchart, Window, listView1);
+                resultsECG = PT.PanTompkinsAlgorithm(amplitude, Fs, time, SamplesToAnalise, EKGchart, Window, listView1, chart1);
                 foreach (double n in resultsECG)
                 {
                     Console.WriteLine(" resultsECG: " + n);
@@ -165,11 +166,15 @@ namespace Application
                 buttonAnaliseClicked = true;
               //  Console.WriteLine("resultsECG " + resultsECG.Count + "  od 8: " + resultsPillow1[6]);
             }
+            Console.WriteLine("START ANALISE echair i physionet: " + eChair + PhysioNet);
+
         }
 
         private void WindowLength_SelectedIndexChanged(object sender, EventArgs e)
-        { 
-                Window = int.Parse(WindowLength.SelectedItem.ToString());
+        {
+            Console.WriteLine("WINDOW SELECTED echair i physionet: " + eChair + PhysioNet);
+
+            Window = int.Parse(WindowLength.SelectedItem.ToString());
                 EKGchart.Annotations.Clear();
                 PressureChart1.Annotations.Clear();
                 PressureChart2.Annotations.Clear();
@@ -179,8 +184,11 @@ namespace Application
                     if (time[i] % Window == 0)
                     {
                         dg.VerticalLine(EKGchart, i, time);
-                        dg.VerticalLine(PressureChart1, i, timeP1);
-                        dg.VerticalLine(PressureChart2, i, timeP2);
+                        if (eChair)
+                        {
+                            dg.VerticalLine(PressureChart1, i, timeP1);
+                            dg.VerticalLine(PressureChart2, i, timeP2);
+                        }
                     }
                 }
         }

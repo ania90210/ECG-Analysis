@@ -29,7 +29,7 @@ namespace Application
                else time.Add(Math.Round(time[SamplesToAnalise - 2]));
 
             }
-            Console.WriteLine("time[SamplesToAnalise - 1] " + time[SamplesToAnalise - 1]);
+            Console.WriteLine(" Math.Round(time[SamplesToAnalise - 1]); " + Math.Round(time[SamplesToAnalise - 1]));
 
             Console.WriteLine("time COUNT " + time.Count);
             // EKG chart
@@ -64,14 +64,6 @@ namespace Application
                     Pressure1.Add(Double.Parse(column[1]));
                     if (i != PressureSamples-1) timeP1.Add(i* Ts);
                     else timeP1.Add(Math.Round(timeP1[PressureSamples - 2]));
-                    /*
-                    Pressure1[i] = Double.Parse(column[1]);
-                    Pressure1[0] = Pressure1[1];
-                    double Ts = Math.Round(time[SamplesToAnalise - 1]) / PressureNumber;
-
-                    timeP1[0] = 0;
-                    timeP1[i] = i * Ts;
-                    */
                 }
 
                 var chartP = PressureChart1.ChartAreas[0];
@@ -138,6 +130,8 @@ namespace Application
         public void VerticalLine(Chart chart, int x, List<double> time)
         {
             VerticalLineAnnotation VA = new VerticalLineAnnotation();
+            Console.WriteLine("time count: " + time.Count());
+
             VA.AxisX = chart.ChartAreas[0].AxisX;
             VA.AllowMoving = false;
             VA.Visible = true;

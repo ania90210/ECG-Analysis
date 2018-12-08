@@ -29,31 +29,35 @@ namespace Application
                         HeartRate = 0;
                     }
 
-                    else if (resultsPillow1[i] >= 4 && resultsPillow2[i] >= 4) // movement && resultsPillow2[i] >= 10
+                    else if (resultsPillow1[i] >= 2 && resultsPillow2[i] >= 2) // movement && resultsPillow2[i] >= 10
                     {
-                        if (HeartRate >= 60 && HeartRate <= 90) comment = "Wszystko OK";
-                        else if (HeartRate >= 40 && HeartRate < 60) comment = "Tętno za małe";
-                        else if (HeartRate > 90 && HeartRate < 110) comment = "Tętno za duże";
-                        else if (HeartRate == 0 || HeartRate < 40) comment = "Zmiana pozycji";
-                        else if (HeartRate < 0 && HeartRate + 200 < 40) { comment = "Zmiana pozycji"; HeartRate = 0; }
-                        else if (HeartRate < 0) { comment = "Arytmia serca"; HeartRate = HeartRate + 200; }
+                        if (HeartRate >= 55 && HeartRate <= 90) comment = "Wszystko OK";
+                        else if (HeartRate >= 45 && HeartRate < 55) comment = "Tętno za małe";
+                        else if (HeartRate > 90 && HeartRate < 100) comment = "Tętno za duże - STRES";
+                        else if (HeartRate >= 100) comment = "ALERT!";
+
+                        else if (HeartRate == 0 || (HeartRate < 45 && HeartRate > 0)) comment = "Zmiana pozycji";
+                        else if (HeartRate < 0 && HeartRate + 200 < 45) { comment = "Zmiana pozycji"; HeartRate = 0; }
+                        else if (HeartRate < 0) { comment = "ALERT!"; HeartRate = HeartRate + 200; } //Arytmia serca
                     }
-                    else if (resultsPillow1[i] < 4 && resultsPillow2[i] < 4) // no movement
+                    else if (resultsPillow1[i] < 2 && resultsPillow2[i] < 2) // no movement
                     {
-                        if (HeartRate >= 60 && HeartRate <= 90) comment = "Wszystko OK";
-                        else if (HeartRate >= 40 && HeartRate < 60) comment = "Tętno za małe";
-                        else if (HeartRate > 90 && HeartRate < 110) comment = "Tętno za duże";
-                        else if (HeartRate == 0 || HeartRate < 40 || HeartRate >= 110) comment = "ALERT!";
-                        else if (HeartRate < 0) { comment = "Arytmia serca"; HeartRate = HeartRate + 200; }
+                        if (HeartRate >= 55 && HeartRate <= 90) comment = "Wszystko OK";
+                        else if (HeartRate >= 45 && HeartRate < 55) comment = "Tętno za małe - SEN";
+                        else if (HeartRate > 90 && HeartRate < 100) comment = "Tętno za duże - STRES";
+
+                        else if (HeartRate == 0 || (HeartRate < 45 && HeartRate > 0) || HeartRate >= 100) comment = "ALERT!";
+                        else if (HeartRate < 0) { comment = "ALERT!"; HeartRate = HeartRate + 200; }
                     }
                 }
                 else
                 {
-                    if (HeartRate >= 60 && HeartRate <= 90) comment = "Wszystko OK";
-                    else if (HeartRate >= 40 && HeartRate < 60) comment = "Tętno za małe";
-                    else if (HeartRate > 90 && HeartRate < 110) comment = "Tętno za duże";
-                    else if (HeartRate == 0 || HeartRate < 40 || HeartRate >= 110) comment = "ALERT!";
-                    else if (HeartRate < 0) { comment = "Arytmia serca"; HeartRate = HeartRate + 200; }
+                    if (HeartRate >= 55 && HeartRate <= 90) comment = "Wszystko OK";
+                    else if (HeartRate >= 40 && HeartRate < 55) comment = "Tętno za małe";
+                    else if (HeartRate > 90 && HeartRate < 100) comment = "Tętno za duże";
+                    else if (HeartRate == 0) { comment = "ALERT!"; HeartRate = 0; }
+                    else if ((HeartRate < 45 && HeartRate > 0) || HeartRate >= 100) comment = "ALERT!";
+                    else if (HeartRate < 0) { comment = "ALERT!"; HeartRate = HeartRate + 200; }
                 }
 
 
