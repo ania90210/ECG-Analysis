@@ -81,7 +81,6 @@ namespace Application
                         eChair = true;
                         PhysioNet = false;
                         Fs = Double.Parse(column[1]); // bez column.Length == 2
-                      //  EKGchart.Series["EKG"].Points.Clear();
 
                     }
                     else if (column[0] == "PhysioNet" && column.Length == 1)
@@ -92,7 +91,6 @@ namespace Application
                         string[] column1 = line3.Split(' ', '"');
                         Fs = 1 / Double.Parse(column1[0].Substring(1).Replace('.', ','));
                         EKGchart.Titles["Title2"].Text = "Amplituda [mV]";
-                       // EKGchart.Series["EKG"].Points.Clear();
                     }
 
                     else
