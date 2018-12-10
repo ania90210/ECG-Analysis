@@ -31,7 +31,6 @@ namespace Application
             }
             Console.WriteLine(" Math.Round(time[SamplesToAnalise - 1]); " + Math.Round(time[SamplesToAnalise - 1]));
 
-            Console.WriteLine("time COUNT " + time.Count);
             // EKG chart
             var chart = EKGchart.ChartAreas[0];
             chart.AxisX.Minimum = 0;
@@ -130,8 +129,6 @@ namespace Application
         public void VerticalLine(Chart chart, int x, List<double> time)
         {
             VerticalLineAnnotation VA = new VerticalLineAnnotation();
-            Console.WriteLine("time count: " + time.Count());
-
             VA.AxisX = chart.ChartAreas[0].AxisX;
             VA.AllowMoving = false;
             VA.Visible = true;

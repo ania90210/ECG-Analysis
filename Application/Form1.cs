@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -15,6 +16,9 @@ namespace Application
 {
     public partial class Application : Form
     {
+        DrawGraphs DG = new DrawGraphs();
+        Stopwatch sw = new Stopwatch();
+
         bool buttonOpenFileClicked = false;
         bool buttonAnaliseClicked = false;
         bool eChair = false;
@@ -23,7 +27,7 @@ namespace Application
         static int SamplesToAnalise; //1000 //8000/ 20000 /21600 /45000 ;
         static int PressureSamples; //120 /100
         double Fs;//100//400//4500 //360;  
-        int Window = 5;
+        public int Window = 5;
 
         List<double> time = new List<double>();
         List<double> amplitude = new List<double>();
@@ -56,9 +60,12 @@ namespace Application
 
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
+                    sw.Reset();
+                    sw.Start(); /////////
+
                     amplitude.Clear();
                     time.Clear();
-                    Pressure2.Clear();
+                    Pressure1.Clear();
                     timeP1.Clear();
                     Pressure2.Clear();
                     timeP2.Clear();
@@ -67,7 +74,6 @@ namespace Application
                     EKGchart.Series["Peaks"].Points.Clear();
                     PressureChart1.Series["Pressure1"].Points.Clear();
                     PressureChart2.Series["Pressure1"].Points.Clear();
-                    chart1.Series["Pressure1"].Points.Clear();
                     EKGchart.Annotations.Clear();
                     PressureChart1.Annotations.Clear();
                     PressureChart2.Annotations.Clear();
@@ -113,17 +119,19 @@ namespace Application
                 int lineNumber = lines.Count();
                 SamplesToAnalise = PressureSamples = lineNumber;
                 Console.WriteLine("Fs " + Fs);
-                DrawGraphs dg = new DrawGraphs();
-                dg.Graphs(Fs, lines, EKGchart, PressureChart1, PressureChart2, SamplesToAnalise, PressureSamples,
+                DG.Graphs(Fs, lines, EKGchart, PressureChart1, PressureChart2, SamplesToAnalise, PressureSamples,
                 time, amplitude, Window, Pressure1, timeP1, Pressure2, timeP2, lineNumber, eChair, PhysioNet);
                 buttonAnaliseClicked = false;
-
+                sw.Stop(); /////////////////////////////////////////////////////
             }
-            Console.WriteLine("FILE OPEN echair i physionet: " + eChair + PhysioNet);
+            Console.WriteLine(" WCZYTAJ PLIK Elapsed={0}", sw.Elapsed.TotalSeconds);
         }
         
         private void Start_Click(object sender, EventArgs e)
         {
+            sw.Reset();
+            sw.Start(); /////////
+
             if (!buttonOpenFileClicked)
             {
                 MessageBox.Show("Wybierz plik do analizy");
@@ -162,10 +170,9 @@ namespace Application
                 FinalResults FR = new FinalResults();
                 FR.FinalResult(resultsPillow1, resultsPillow2, resultsECG, listView1, Window, eChair);
                 buttonAnaliseClicked = true;
-              //  Console.WriteLine("resultsECG " + resultsECG.Count + "  od 8: " + resultsPillow1[6]);
+                sw.Stop(); /////////////////////////////////////////////////////
             }
-            Console.WriteLine("START ANALISE echair i physionet: " + eChair + PhysioNet);
-
+            Console.WriteLine("ANALIZA Elapsed={0}", sw.Elapsed.TotalSeconds);
         }
 
         private void WindowLength_SelectedIndexChanged(object sender, EventArgs e)
@@ -176,16 +183,15 @@ namespace Application
                 EKGchart.Annotations.Clear();
                 PressureChart1.Annotations.Clear();
                 PressureChart2.Annotations.Clear();
-                DrawGraphs dg = new DrawGraphs();
                 for (int i = 0; i < SamplesToAnalise; i++)
                 {
                     if (time[i] % Window == 0)
                     {
-                        dg.VerticalLine(EKGchart, i, time);
+                        DG.VerticalLine(EKGchart, i, time);
                         if (eChair)
                         {
-                            dg.VerticalLine(PressureChart1, i, timeP1);
-                            dg.VerticalLine(PressureChart2, i, timeP2);
+                            DG.VerticalLine(PressureChart1, i, timeP1);
+                            DG.VerticalLine(PressureChart2, i, timeP2);
                         }
                     }
                 }

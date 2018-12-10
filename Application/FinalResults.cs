@@ -23,28 +23,29 @@ namespace Application
                 HeartRate = resultsECG[i];
                 if (eChair)
                 {
-                    if (resultsPillow1[i] == 0 && resultsPillow2[i] == 0) // jezeli nikt nie siedzi
+                   /* if (resultsPillow1[i] == 0 && resultsPillow2[i] == 0) // jezeli nikt nie siedzi
                     {
-                        comment = "Brak nacisku";
+                        comment = "Brak ruchu";
                         HeartRate = 0;
-                    }
+                    }*/
 
-                    else if (resultsPillow1[i] >= 2 && resultsPillow2[i] >= 2) // movement && resultsPillow2[i] >= 10
+                    if (resultsPillow1[i] >= 1 && resultsPillow2[i] >= 1) // movement && resultsPillow2[i] >= 10
                     {
                         if (HeartRate >= 55 && HeartRate <= 90) comment = "Wszystko OK";
-                        else if (HeartRate >= 45 && HeartRate < 55) comment = "Tętno za małe";
-                        else if (HeartRate > 90 && HeartRate < 100) comment = "Tętno za duże - STRES";
+                        else if (HeartRate >= 45 && HeartRate < 55) comment = "Puls za niski";
+                        else if (HeartRate > 90 && HeartRate < 100) comment = "Puls za wysoki - STRES";
                         else if (HeartRate >= 100) comment = "ALERT!";
 
                         else if (HeartRate == 0 || (HeartRate < 45 && HeartRate > 0)) comment = "Zmiana pozycji";
-                        else if (HeartRate < 0 && HeartRate + 200 < 45) { comment = "Zmiana pozycji"; HeartRate = 0; }
-                        else if (HeartRate < 0) { comment = "ALERT!"; HeartRate = HeartRate + 200; } //Arytmia serca
+                        else if (HeartRate < 0 ) { comment = "Zmiana pozycji"; HeartRate = 0; }
+                        // else if (HeartRate < 0 && HeartRate + 200 < 45) { comment = "Zmiana pozycji"; HeartRate = 0; }
+                        //else if (HeartRate < 0) { comment = "ALERT!"; HeartRate = HeartRate + 200; } //Arytmia serca
                     }
-                    else if (resultsPillow1[i] < 2 && resultsPillow2[i] < 2) // no movement
+                    else if (resultsPillow1[i] < 1 && resultsPillow2[i] < 1) // no movement
                     {
                         if (HeartRate >= 55 && HeartRate <= 90) comment = "Wszystko OK";
-                        else if (HeartRate >= 45 && HeartRate < 55) comment = "Tętno za małe - SEN";
-                        else if (HeartRate > 90 && HeartRate < 100) comment = "Tętno za duże - STRES";
+                        else if (HeartRate >= 45 && HeartRate < 55) comment = "Puls za niski - SEN";
+                        else if (HeartRate > 90 && HeartRate < 100) comment = "Puls za wysoki - STRES";
 
                         else if (HeartRate == 0 || (HeartRate < 45 && HeartRate > 0) || HeartRate >= 100) comment = "ALERT!";
                         else if (HeartRate < 0) { comment = "ALERT!"; HeartRate = HeartRate + 200; }
@@ -53,8 +54,8 @@ namespace Application
                 else
                 {
                     if (HeartRate >= 55 && HeartRate <= 90) comment = "Wszystko OK";
-                    else if (HeartRate >= 40 && HeartRate < 55) comment = "Tętno za małe";
-                    else if (HeartRate > 90 && HeartRate < 100) comment = "Tętno za duże";
+                    else if (HeartRate >= 40 && HeartRate < 55) comment = "Puls za niski";
+                    else if (HeartRate > 90 && HeartRate < 100) comment = "Puls za wysoki";
                     else if (HeartRate == 0) { comment = "ALERT!"; HeartRate = 0; }
                     else if ((HeartRate < 45 && HeartRate > 0) || HeartRate >= 100) comment = "ALERT!";
                     else if (HeartRate < 0) { comment = "ALERT!"; HeartRate = HeartRate + 200; }

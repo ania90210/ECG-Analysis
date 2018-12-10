@@ -25,7 +25,7 @@ namespace Application
         public List<double> PanTompkinsAlgorithm(List<double> inputdata, double sampleRate, List<double> intime, int SamplesToAnalise, Chart EKGchart, 
                 int WindowLength, ListView listView1, Chart chart1)
         {
-            Console.WriteLine("sample rate: " +sampleRate);
+            Console.WriteLine("resultsHR COUNT:  " + resultsHR.Count());
             double[] lowFilter = new double[SamplesToAnalise + 5];            
             double[] highFilter = new double[SamplesToAnalise + 5];
             double[] indata = inputdata.ToArray();
@@ -35,8 +35,11 @@ namespace Application
             BandPassFilter bf = new BandPassFilter();
             lowFilter = bf.Filter(indata, sampleRate, "LOW");              
             highFilter = bf.Filter(lowFilter, sampleRate, "HIGH");
-            // DERIVATIVE
-            double[] derivative = new double[SamplesToAnalise];
+
+            
+
+         // DERIVATIVE
+         double[] derivative = new double[SamplesToAnalise];
 
             for (int i = 0; i < SamplesToAnalise - 1; i++)
             {
@@ -78,21 +81,22 @@ namespace Application
 
                 average[j - (movingAverageFilter - 1)] = sum / movingAverageFilter;
             }
-            chart1.ChartAreas[0].AxisX.Minimum = 0;
+           /* chart1.ChartAreas[0].AxisX.Minimum = 0;
             chart1.ChartAreas[0].AxisX.Interval = 5;
-            chart1.ChartAreas[0].AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
-            for (int i = 0; i < SamplesToAnalise; i++)
+            chart1.ChartAreas[0].AxisX.Maximum = 10;
+            for (int i = 0; i < 45000; i++)
             {
                 chart1.Series["Pressure1"].Points.AddXY(time[i], average[i]);
-            }
-            
-         // FIRST PEAK
-         /* int Samples = 0;
-          if (sampleRate == 100) Samples = 100;
-          else if (sampleRate == 400 || sampleRate == 360) Samples = 380;
-          else if (sampleRate == 4500) Samples = 4300;
-          else Samples = 200;*/
-         int Samples = (int)(sampleRate * 0.95);
+            }*/
+
+
+            // FIRST PEAK
+            /* int Samples = 0;
+             if (sampleRate == 100) Samples = 100;
+             else if (sampleRate == 400 || sampleRate == 360) Samples = 380;
+             else if (sampleRate == 4500) Samples = 4300;
+             else Samples = 200;*/
+            int Samples = (int)sampleRate;
             double[] firstSamples = new double[Samples];
             for (int i = 0; i < Samples; i++)   
             {
@@ -100,7 +104,7 @@ namespace Application
             }
 
             double maxValue = firstSamples.Max();
-            double SPK = 0.7*maxValue;//0.13 * maxValue; //maxValue
+            double SPK = 0.7*maxValue;
             double NPK = 0.1 * SPK;
             double THRESHOLD = 0.25 * SPK + 0.75 * NPK;
             //  double THRESHOLD = 0.5* maxValue;
@@ -108,7 +112,7 @@ namespace Application
 
             
             // DETECTION
-            for (int i = Array.FindIndex(firstSamples, w => w == maxValue); i < SamplesToAnalise; i++) 
+            for (int i =0; i < SamplesToAnalise; i++) //int i = Array.FindIndex(firstSamples, w => w == maxValue)
             {
                 if (average[i] > THRESHOLD)
                 {
@@ -257,7 +261,7 @@ namespace Application
             }
             for (int i = 0; i < RtooHigh_Low.Count; i++) //+2
             {
-                if (RtooHigh_Low.Count > 2 && result != "noise" && RtooHigh_Low[i] >= y * WindowLength && RtooHigh_Low[i] < x * WindowLength) // !=0
+                if (RtooHigh_Low.Count > 0 && result != "noise" && RtooHigh_Low[i] >= y * WindowLength && RtooHigh_Low[i] < x * WindowLength) // !=0
                 {                    
                     result = "irregularity";
                     Rerror++;

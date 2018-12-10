@@ -29,20 +29,24 @@ namespace Application
             return resultsSD;
         }
 
-        private double standardDeviation(List<double> PressureP, List<double> timeP, int Window, int x, int y) 
+        private double standardDeviation(List<double> Pressure, List<double> time, int Window, int x, int y) 
         {
-            double MeanValue = 10;
+            List<double> pressureValues = new List<double>();
             double sum = 0;
-            double sd = 0;
-            List<double> standardD = new List<double>();
+            double MeanValue = 0;
+            double numerator = 0;
+            double standardDeviation = 0;
 
-            for (int i = timeP.FindIndex(w => w == y * Window); i <= timeP.FindIndex(w => w == x * Window); i=i+50)
+            for (int i = time.FindIndex(w => w == y * Window); i <= time.FindIndex(w => w == x * Window); i=i+50)
             {
-                standardD.Add(PressureP[i]);
+                pressureValues.Add(Pressure[i]);
+                sum = sum + Pressure[i];
             }
-            sum = standardD.Select(w => (w - MeanValue) * (w - MeanValue)).Sum();
-            sd = Math.Sqrt(sum / (standardD.Count() - 1));
-            return sd;
+            MeanValue = sum / pressureValues.Count();
+            numerator = pressureValues.Select(w => (w - MeanValue) * (w - MeanValue)).Sum();
+            standardDeviation = Math.Sqrt(numerator / pressureValues.Count());
+            Console.WriteLine("MeanValue " + MeanValue + " numerator " + numerator);
+            return standardDeviation;
         }
     }
 }

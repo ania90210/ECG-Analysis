@@ -45,8 +45,8 @@ namespace Application
             System.Windows.Forms.DataVisualization.Charting.Title title8 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataVisualization.Charting.Title title9 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title10 = new System.Windows.Forms.DataVisualization.Charting.Title();
             this.EKGchart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.PressureChart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.OpenFileButton = new System.Windows.Forms.Button();
@@ -215,7 +215,7 @@ namespace Application
             chartArea3.Position.X = 3F;
             chartArea3.Position.Y = 6F;
             this.PressureChart2.ChartAreas.Add(chartArea3);
-            this.PressureChart2.Location = new System.Drawing.Point(23, 686);
+            this.PressureChart2.Location = new System.Drawing.Point(23, 692);
             this.PressureChart2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.PressureChart2.Name = "PressureChart2";
             series4.ChartArea = "ChartArea1";
@@ -272,7 +272,7 @@ namespace Application
             this.listView1.Font = new System.Drawing.Font("Arial", 10.8F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
             this.listView1.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.listView1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-            this.listView1.Location = new System.Drawing.Point(1378, 148);
+            this.listView1.Location = new System.Drawing.Point(1379, 151);
             this.listView1.Margin = new System.Windows.Forms.Padding(3, 25, 3, 25);
             this.listView1.Name = "listView1";
             this.listView1.Size = new System.Drawing.Size(609, 590);
@@ -323,20 +323,32 @@ namespace Application
             // 
             // chart1
             // 
+            this.chart1.BackColor = System.Drawing.Color.DarkGray;
+            this.chart1.BackGradientStyle = System.Windows.Forms.DataVisualization.Charting.GradientStyle.TopBottom;
+            this.chart1.BackSecondaryColor = System.Drawing.Color.Gainsboro;
+            this.chart1.BorderlineColor = System.Drawing.Color.DarkGray;
+            this.chart1.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
             chartArea4.Name = "ChartArea1";
             this.chart1.ChartAreas.Add(chartArea4);
-            legend1.Name = "Legend1";
-            this.chart1.Legends.Add(legend1);
-            this.chart1.Location = new System.Drawing.Point(221, 534);
+            this.chart1.Location = new System.Drawing.Point(1379, 1043);
             this.chart1.Name = "chart1";
             series5.ChartArea = "ChartArea1";
-            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series5.Legend = "Legend1";
+            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
+            series5.Color = System.Drawing.Color.Blue;
             series5.Name = "Pressure1";
             this.chart1.Series.Add(series5);
-            this.chart1.Size = new System.Drawing.Size(1151, 402);
+            this.chart1.Size = new System.Drawing.Size(296, 95);
             this.chart1.TabIndex = 17;
             this.chart1.Text = "chart1";
+            title10.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
+            title10.Name = "Title1";
+            title10.Position.Auto = false;
+            title10.Position.Height = 6.09375F;
+            title10.Position.Width = 94F;
+            title10.Position.X = 3F;
+            title10.Position.Y = 93F;
+            title10.Text = "Czas [s]";
+            this.chart1.Titles.Add(title10);
             // 
             // Application
             // 
@@ -345,7 +357,7 @@ namespace Application
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.ClientSize = new System.Drawing.Size(1924, 992);
+            this.ClientSize = new System.Drawing.Size(1924, 1055);
             this.Controls.Add(this.chart1);
             this.Controls.Add(this.saveButton);
             this.Controls.Add(this.label1);
