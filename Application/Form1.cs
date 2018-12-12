@@ -16,8 +16,7 @@ namespace Application
 {
     public partial class Application : Form
     {
-        DrawGraphs DG = new DrawGraphs();
-        Stopwatch sw = new Stopwatch();
+      //  Stopwatch sw = new Stopwatch();
 
         bool buttonOpenFileClicked = false;
         bool buttonAnaliseClicked = false;
@@ -60,8 +59,8 @@ namespace Application
 
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
-                    sw.Reset();
-                    sw.Start(); /////////
+           //         sw.Reset();
+               //     sw.Start(); /////////
 
                     amplitude.Clear();
                     time.Clear();
@@ -119,18 +118,21 @@ namespace Application
                 int lineNumber = lines.Count();
                 SamplesToAnalise = PressureSamples = lineNumber;
                 Console.WriteLine("Fs " + Fs);
+                DrawGraphs DG = new DrawGraphs();
                 DG.Graphs(Fs, lines, EKGchart, PressureChart1, PressureChart2, SamplesToAnalise, PressureSamples,
                 time, amplitude, Window, Pressure1, timeP1, Pressure2, timeP2, lineNumber, eChair, PhysioNet);
                 buttonAnaliseClicked = false;
-                sw.Stop(); /////////////////////////////////////////////////////
+
+                Console.WriteLine(" OK Physionet" + PhysioNet + " echair: " +eChair);
+             //   sw.Stop(); /////////////////////////////////////////////////////
             }
-            Console.WriteLine(" WCZYTAJ PLIK Elapsed={0}", sw.Elapsed.TotalSeconds);
+          //  Console.WriteLine(" WCZYTAJ PLIK Elapsed={0}", sw.Elapsed.TotalSeconds);
         }
         
         private void Start_Click(object sender, EventArgs e)
         {
-            sw.Reset();
-            sw.Start(); /////////
+          //  sw.Reset();
+          //  sw.Start(); /////////
 
             if (!buttonOpenFileClicked)
             {
@@ -162,7 +164,7 @@ namespace Application
                     }
                 }
                 PanTompkins PT = new PanTompkins();
-                resultsECG = PT.PanTompkinsAlgorithm(amplitude, Fs, time, SamplesToAnalise, EKGchart, Window, listView1, chart1);
+                resultsECG = PT.PanTompkinsAlgorithm(amplitude, Fs, time, SamplesToAnalise, EKGchart, Window, listView1, PhysioNet);
                 foreach (double n in resultsECG)
                 {
                     Console.WriteLine(" resultsECG: " + n);
@@ -170,9 +172,9 @@ namespace Application
                 FinalResults FR = new FinalResults();
                 FR.FinalResult(resultsPillow1, resultsPillow2, resultsECG, listView1, Window, eChair);
                 buttonAnaliseClicked = true;
-                sw.Stop(); /////////////////////////////////////////////////////
+            //    sw.Stop(); /////////////////////////////////////////////////////
             }
-            Console.WriteLine("ANALIZA Elapsed={0}", sw.Elapsed.TotalSeconds);
+    //        Console.WriteLine("ANALIZA Elapsed={0}", sw.Elapsed.TotalSeconds);
         }
 
         private void WindowLength_SelectedIndexChanged(object sender, EventArgs e)
@@ -183,7 +185,9 @@ namespace Application
                 EKGchart.Annotations.Clear();
                 PressureChart1.Annotations.Clear();
                 PressureChart2.Annotations.Clear();
-                for (int i = 0; i < SamplesToAnalise; i++)
+                DrawGraphs DG = new DrawGraphs();
+
+            for (int i = 0; i < SamplesToAnalise; i++)
                 {
                     if (time[i] % Window == 0)
                     {

@@ -33,7 +33,7 @@ namespace Application
                     {
                         if (HeartRate >= 55 && HeartRate <= 90) comment = "Wszystko OK";
                         else if (HeartRate >= 45 && HeartRate < 55) comment = "Puls za niski";
-                        else if (HeartRate > 90 && HeartRate < 100) comment = "Puls za wysoki - STRES";
+                        else if (HeartRate > 90 && HeartRate < 100) comment = "Puls za wysoki";
                         else if (HeartRate >= 100) comment = "ALERT!";
 
                         else if (HeartRate == 0 || (HeartRate < 45 && HeartRate > 0)) comment = "Zmiana pozycji";
@@ -44,21 +44,21 @@ namespace Application
                     else if (resultsPillow1[i] < 1 && resultsPillow2[i] < 1) // no movement
                     {
                         if (HeartRate >= 55 && HeartRate <= 90) comment = "Wszystko OK";
-                        else if (HeartRate >= 45 && HeartRate < 55) comment = "Puls za niski - SEN";
-                        else if (HeartRate > 90 && HeartRate < 100) comment = "Puls za wysoki - STRES";
+                        else if (HeartRate >= 45 && HeartRate < 55) comment = "Puls za niski";
+                        else if (HeartRate > 90 && HeartRate < 100) comment = "Puls za wysoki";
 
                         else if (HeartRate == 0 || (HeartRate < 45 && HeartRate > 0) || HeartRate >= 100) comment = "ALERT!";
-                        else if (HeartRate < 0) { comment = "ALERT!"; HeartRate = HeartRate + 200; }
+                        else if (HeartRate < 0) { comment = "ALERT!"; HeartRate = HeartRate + 400; }
                     }
                 }
                 else
                 {
                     if (HeartRate >= 55 && HeartRate <= 90) comment = "Wszystko OK";
-                    else if (HeartRate >= 40 && HeartRate < 55) comment = "Puls za niski";
+                    else if (HeartRate >= 45 && HeartRate < 55) comment = "Puls za niski";
                     else if (HeartRate > 90 && HeartRate < 100) comment = "Puls za wysoki";
-                    else if (HeartRate == 0) { comment = "ALERT!"; HeartRate = 0; }
                     else if ((HeartRate < 45 && HeartRate > 0) || HeartRate >= 100) comment = "ALERT!";
-                    else if (HeartRate < 0) { comment = "ALERT!"; HeartRate = HeartRate + 200; }
+
+                    else if (HeartRate < 0) { comment = "ALERT!"; HeartRate = HeartRate + 400; }
                 }
 
 

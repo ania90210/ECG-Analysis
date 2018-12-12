@@ -44,9 +44,6 @@ namespace Application
             System.Windows.Forms.DataVisualization.Charting.Title title7 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataVisualization.Charting.Title title8 = new System.Windows.Forms.DataVisualization.Charting.Title();
             System.Windows.Forms.DataVisualization.Charting.Title title9 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Series series5 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Title title10 = new System.Windows.Forms.DataVisualization.Charting.Title();
             this.EKGchart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.PressureChart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.OpenFileButton = new System.Windows.Forms.Button();
@@ -59,11 +56,9 @@ namespace Application
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.label1 = new System.Windows.Forms.Label();
             this.saveButton = new System.Windows.Forms.Button();
-            this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             ((System.ComponentModel.ISupportInitialize)(this.EKGchart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.PressureChart1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.PressureChart2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.SuspendLayout();
             // 
             // EKGchart
@@ -321,35 +316,6 @@ namespace Application
             this.saveButton.UseVisualStyleBackColor = false;
             this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
             // 
-            // chart1
-            // 
-            this.chart1.BackColor = System.Drawing.Color.DarkGray;
-            this.chart1.BackGradientStyle = System.Windows.Forms.DataVisualization.Charting.GradientStyle.TopBottom;
-            this.chart1.BackSecondaryColor = System.Drawing.Color.Gainsboro;
-            this.chart1.BorderlineColor = System.Drawing.Color.DarkGray;
-            this.chart1.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
-            chartArea4.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea4);
-            this.chart1.Location = new System.Drawing.Point(1379, 1043);
-            this.chart1.Name = "chart1";
-            series5.ChartArea = "ChartArea1";
-            series5.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.FastLine;
-            series5.Color = System.Drawing.Color.Blue;
-            series5.Name = "Pressure1";
-            this.chart1.Series.Add(series5);
-            this.chart1.Size = new System.Drawing.Size(296, 95);
-            this.chart1.TabIndex = 17;
-            this.chart1.Text = "chart1";
-            title10.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
-            title10.Name = "Title1";
-            title10.Position.Auto = false;
-            title10.Position.Height = 6.09375F;
-            title10.Position.Width = 94F;
-            title10.Position.X = 3F;
-            title10.Position.Y = 93F;
-            title10.Text = "Czas [s]";
-            this.chart1.Titles.Add(title10);
-            // 
             // Application
             // 
             this.AllowDrop = true;
@@ -358,7 +324,6 @@ namespace Application
             this.AutoSize = true;
             this.BackColor = System.Drawing.Color.WhiteSmoke;
             this.ClientSize = new System.Drawing.Size(1924, 1055);
-            this.Controls.Add(this.chart1);
             this.Controls.Add(this.saveButton);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.listView1);
@@ -376,7 +341,6 @@ namespace Application
             ((System.ComponentModel.ISupportInitialize)(this.EKGchart)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.PressureChart1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.PressureChart2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -395,7 +359,6 @@ namespace Application
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ColumnHeader columnHeader3;
         private System.Windows.Forms.Button saveButton;
-        private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
     }
 }
 

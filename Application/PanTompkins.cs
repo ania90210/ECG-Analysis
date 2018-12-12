@@ -23,7 +23,7 @@ namespace Application
         double HeartRate;
 
         public List<double> PanTompkinsAlgorithm(List<double> inputdata, double sampleRate, List<double> intime, int SamplesToAnalise, Chart EKGchart, 
-                int WindowLength, ListView listView1, Chart chart1)
+                int WindowLength, ListView listView1, bool PhysioNet)
         {
             Console.WriteLine("resultsHR COUNT:  " + resultsHR.Count());
             double[] lowFilter = new double[SamplesToAnalise + 5];            
@@ -36,10 +36,16 @@ namespace Application
             lowFilter = bf.Filter(indata, sampleRate, "LOW");              
             highFilter = bf.Filter(lowFilter, sampleRate, "HIGH");
 
-            
+          //   chart1.ChartAreas[0].AxisX.Minimum = 0;
+           //chart1.ChartAreas[0].AxisX.Interval = 5;
+           //chart1.ChartAreas[0].AxisX.Maximum = 10;
+           //for (int i = 0; i < 45000; i++)
+           //{
+             //  chart1.Series["Pressure1"].Points.AddXY(time[i], lowFilter[i]);
+           //}
 
-         // DERIVATIVE
-         double[] derivative = new double[SamplesToAnalise];
+            // DERIVATIVE
+            double[] derivative = new double[SamplesToAnalise];
 
             for (int i = 0; i < SamplesToAnalise - 1; i++)
             {
@@ -81,13 +87,7 @@ namespace Application
 
                 average[j - (movingAverageFilter - 1)] = sum / movingAverageFilter;
             }
-           /* chart1.ChartAreas[0].AxisX.Minimum = 0;
-            chart1.ChartAreas[0].AxisX.Interval = 5;
-            chart1.ChartAreas[0].AxisX.Maximum = 10;
-            for (int i = 0; i < 45000; i++)
-            {
-                chart1.Series["Pressure1"].Points.AddXY(time[i], average[i]);
-            }*/
+          
 
 
             // FIRST PEAK
@@ -241,13 +241,13 @@ namespace Application
             double RoundWindow = Math.Floor(numberOfWindows);//Math.Round(numberOfWindows);
             for (int i = 0; i < RoundWindow; i++)
             {
-                resultsHR.Add(CalculateHeartRate(WindowLength, RTime, ListOfPeaks, x, y, listView1, error, RtooHigh_Low));
+                resultsHR.Add(CalculateHeartRate(WindowLength, RTime, ListOfPeaks, x, y, listView1, error, RtooHigh_Low, PhysioNet));
                 y++;
                 x++;
             }
             return resultsHR;
         }
-        private double CalculateHeartRate(int WindowLength, List<double> RTime, List<double> ListOfPeaks, int x, int y, ListView listView1, List<double> error, List<double> RtooHigh_Low)
+        private double CalculateHeartRate(int WindowLength, List<double> RTime, List<double> ListOfPeaks, int x, int y, ListView listView1, List<double> error, List<double> RtooHigh_Low, bool PhysioNet)
         {            
             int R = 0;
             int Rerror = 0;
@@ -278,9 +278,17 @@ namespace Application
            // if (RtooHigh_Low.Count < 3 && result != "noise") { result = ""; R = R - RtooHigh_Low.Count;  }
             double perMinute = 60 / WindowLength;
             HeartRate = R * perMinute;
-            if (result == "noise") HeartRate = 0;
-            else if (result == "irregularity") HeartRate = HeartRate - 200;
-
+            Console.WriteLine("Physionet : " + PhysioNet);
+            if (PhysioNet)
+            {
+                if (result == "noise" || result == "irregularity") HeartRate = HeartRate - 400; ;
+            }
+            else
+            {
+                if (result == "noise") HeartRate = 0;
+                else if (result == "irregularity") HeartRate = HeartRate - 400;
+            }           
+            
             return HeartRate;
         }
     }
