@@ -13,7 +13,7 @@ namespace Application
         string[] column;
         public void Graphs(double Fs, string[] lines, Chart EKGchart, Chart PressureChart1, Chart PressureChart2, int SamplesToAnalise, 
             int PressureSamples, List<double> time, List<double> amplitude, int Window, List<double> Pressure1, List<double> timeP1, 
-            List<double> Pressure2, List<double> timeP2, int lineNumber, bool eChair, bool PhysioNet)
+            List<double> Pressure2, List<double> timeP2, bool eChair, bool PhysioNet)
         {
             double Ts = 1 / Fs;
 

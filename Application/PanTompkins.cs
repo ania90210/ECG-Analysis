@@ -23,7 +23,7 @@ namespace Application
         double HeartRate;
 
         public List<double> PanTompkinsAlgorithm(List<double> inputdata, double sampleRate, List<double> intime, int SamplesToAnalise, Chart EKGchart, 
-                int WindowLength, ListView listView1, bool PhysioNet)
+                int WindowLength, bool PhysioNet)
         {
             Console.WriteLine("resultsHR COUNT:  " + resultsHR.Count());
             double[] lowFilter = new double[SamplesToAnalise + 5];            
@@ -241,13 +241,13 @@ namespace Application
             double RoundWindow = Math.Floor(numberOfWindows);//Math.Round(numberOfWindows);
             for (int i = 0; i < RoundWindow; i++)
             {
-                resultsHR.Add(CalculateHeartRate(WindowLength, RTime, ListOfPeaks, x, y, listView1, error, RtooHigh_Low, PhysioNet));
+                resultsHR.Add(CalculateHeartRate(WindowLength, RTime, ListOfPeaks, x, y, error, RtooHigh_Low, PhysioNet));
                 y++;
                 x++;
             }
             return resultsHR;
         }
-        private double CalculateHeartRate(int WindowLength, List<double> RTime, List<double> ListOfPeaks, int x, int y, ListView listView1, List<double> error, List<double> RtooHigh_Low, bool PhysioNet)
+        private double CalculateHeartRate(int WindowLength, List<double> RTime, List<double> ListOfPeaks, int x, int y, List<double> error, List<double> RtooHigh_Low, bool PhysioNet)
         {            
             int R = 0;
             int Rerror = 0;

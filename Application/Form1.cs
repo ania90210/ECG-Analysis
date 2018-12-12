@@ -120,7 +120,7 @@ namespace Application
                 Console.WriteLine("Fs " + Fs);
                 DrawGraphs DG = new DrawGraphs();
                 DG.Graphs(Fs, lines, EKGchart, PressureChart1, PressureChart2, SamplesToAnalise, PressureSamples,
-                time, amplitude, Window, Pressure1, timeP1, Pressure2, timeP2, lineNumber, eChair, PhysioNet);
+                time, amplitude, Window, Pressure1, timeP1, Pressure2, timeP2, eChair, PhysioNet);
                 buttonAnaliseClicked = false;
 
                 Console.WriteLine(" OK Physionet" + PhysioNet + " echair: " +eChair);
@@ -164,7 +164,7 @@ namespace Application
                     }
                 }
                 PanTompkins PT = new PanTompkins();
-                resultsECG = PT.PanTompkinsAlgorithm(amplitude, Fs, time, SamplesToAnalise, EKGchart, Window, listView1, PhysioNet);
+                resultsECG = PT.PanTompkinsAlgorithm(amplitude, Fs, time, SamplesToAnalise, EKGchart, Window, PhysioNet);
                 foreach (double n in resultsECG)
                 {
                     Console.WriteLine(" resultsECG: " + n);
