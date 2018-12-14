@@ -16,16 +16,14 @@ namespace Application
 {
     public partial class Application : Form
     {
-      //  Stopwatch sw = new Stopwatch();
-
         bool buttonOpenFileClicked = false;
         bool buttonAnaliseClicked = false;
         bool eChair = false;
         bool PhysioNet = false;
 
-        static int SamplesToAnalise; //1000 //8000/ 20000 /21600 /45000 ;
-        static int PressureSamples; //120 /100
-        double Fs;//100//400//4500 //360;  
+        static int SamplesToAnalise; 
+        static int PressureSamples; 
+        double Fs;  
         public int Window = 5;
 
         List<double> time = new List<double>();
@@ -53,15 +51,12 @@ namespace Application
             using (OpenFileDialog ofd = new OpenFileDialog())
             {
                 ofd.Title = "Wybierz plik do analizy";
-                ofd.InitialDirectory = "C:\\Users\\Ania\\Desktop\\Inzynierka\\pliki";//Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                ofd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
                 ofd.Filter = "TXT (*.txt)|*.txt";
                 ofd.RestoreDirectory = true;
 
                 if (ofd.ShowDialog() == DialogResult.OK)
                 {
-           //         sw.Reset();
-               //     sw.Start(); /////////
-
                     amplitude.Clear();
                     time.Clear();
                     Pressure1.Clear();
@@ -85,7 +80,7 @@ namespace Application
                     {
                         eChair = true;
                         PhysioNet = false;
-                        Fs = Double.Parse(column[1]); // bez column.Length == 2
+                        Fs = Double.Parse(column[1]);
 
                     }
                     else if (column[0] == "PhysioNet" && column.Length == 1)
@@ -107,33 +102,25 @@ namespace Application
                 }
             }
             if (fileName != null) 
-            {               
-               
+            {                              
                 WindowLength.Enabled = true;
                 buttonOpenFileClicked = true;
 
                 string[] lines = File.ReadAllLines(fileName);
+                // usuwanie zbêdnych linijek pliku
                 if (eChair) lines = lines.Skip(1).ToArray();
                 else if (PhysioNet) lines = lines.Skip(3).ToArray();
                 int lineNumber = lines.Count();
-                SamplesToAnalise = PressureSamples = lineNumber;
-                Console.WriteLine("Fs " + Fs);
+                SamplesToAnalise = PressureSamples = lineNumber; // liczba danych do analizy
                 DrawGraphs DG = new DrawGraphs();
                 DG.Graphs(Fs, lines, EKGchart, PressureChart1, PressureChart2, SamplesToAnalise, PressureSamples,
                 time, amplitude, Window, Pressure1, timeP1, Pressure2, timeP2, eChair, PhysioNet);
                 buttonAnaliseClicked = false;
-
-                Console.WriteLine(" OK Physionet" + PhysioNet + " echair: " +eChair);
-             //   sw.Stop(); /////////////////////////////////////////////////////
             }
-          //  Console.WriteLine(" WCZYTAJ PLIK Elapsed={0}", sw.Elapsed.TotalSeconds);
         }
         
         private void Start_Click(object sender, EventArgs e)
         {
-          //  sw.Reset();
-          //  sw.Start(); /////////
-
             if (!buttonOpenFileClicked)
             {
                 MessageBox.Show("Wybierz plik do analizy");
@@ -145,48 +132,34 @@ namespace Application
             if (buttonOpenFileClicked && Window <= SamplesToAnalise / Fs)
             {
                 listView1.Items.Clear();
-
                 List<double> resultsPillow1 = new List<double>();
                 List<double> resultsPillow2 = new List<double>();
                 List<double> resultsECG = new List<double>();
+
                 if (eChair)
                 {
                     Pillows pillow = new Pillows();
-                    resultsPillow1 = pillow.checkPillow(Pressure1, timeP1, PressureSamples, Fs, Window);
-                    foreach (double n in resultsPillow1)
-                    {
-                        Console.WriteLine(" pillow1: " + n);
-                    }
-                    resultsPillow2 = pillow.checkPillow(Pressure2, timeP2, PressureSamples, Fs, Window);
-                    foreach (double n in resultsPillow2)
-                    {
-                        Console.WriteLine(" pillow 2: " + n);
-                    }
+                    resultsPillow1 = pillow.checkPillow(Pressure1, timeP1, PressureSamples, Fs, Window);                 
+                    resultsPillow2 = pillow.checkPillow(Pressure2, timeP2, PressureSamples, Fs, Window);                  
                 }
                 PanTompkins PT = new PanTompkins();
                 resultsECG = PT.PanTompkinsAlgorithm(amplitude, Fs, time, SamplesToAnalise, EKGchart, Window, PhysioNet);
-                foreach (double n in resultsECG)
-                {
-                    Console.WriteLine(" resultsECG: " + n);
-                }
+
                 FinalResults FR = new FinalResults();
                 FR.FinalResult(resultsPillow1, resultsPillow2, resultsECG, listView1, Window, eChair);
                 buttonAnaliseClicked = true;
-            //    sw.Stop(); /////////////////////////////////////////////////////
             }
-    //        Console.WriteLine("ANALIZA Elapsed={0}", sw.Elapsed.TotalSeconds);
         }
 
         private void WindowLength_SelectedIndexChanged(object sender, EventArgs e)
         {
-            Console.WriteLine("WINDOW SELECTED echair i physionet: " + eChair + PhysioNet);
-
             Window = int.Parse(WindowLength.SelectedItem.ToString());
-                EKGchart.Annotations.Clear();
-                PressureChart1.Annotations.Clear();
-                PressureChart2.Annotations.Clear();
-                DrawGraphs DG = new DrawGraphs();
+            EKGchart.Annotations.Clear();
+            PressureChart1.Annotations.Clear();
+            PressureChart2.Annotations.Clear();
+            DrawGraphs DG = new DrawGraphs();
 
+            // rysowanie podzia³ki
             for (int i = 0; i < SamplesToAnalise; i++)
                 {
                     if (time[i] % Window == 0)

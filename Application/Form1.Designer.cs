@@ -76,7 +76,7 @@ namespace Application
             chartArea1.Position.Auto = false;
             chartArea1.Position.Height = 87F;
             chartArea1.Position.Width = 94F;
-            chartArea1.Position.X = 3F;
+            chartArea1.Position.X = 2F;
             chartArea1.Position.Y = 6F;
             this.EKGchart.ChartAreas.Add(chartArea1);
             this.EKGchart.Location = new System.Drawing.Point(23, 102);

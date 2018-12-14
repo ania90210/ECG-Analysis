@@ -14,7 +14,7 @@ namespace Application
         public List<double> checkPillow(List<double> Pressure, List<double> timeP, int SamplesToAnalise, double Fs, int Window)
         {
             List<double> resultsSD = new List<double>();
-
+            // obliczanie odchylenia standardowego dla każdego okna czasowego
             int y = 0;
             int x = 1;
             double numberOfWindows = (SamplesToAnalise / Fs) / Window;
@@ -45,7 +45,6 @@ namespace Application
             MeanValue = sum / pressureValues.Count();
             numerator = pressureValues.Select(w => (w - MeanValue) * (w - MeanValue)).Sum();
             standardDeviation = Math.Sqrt(numerator / pressureValues.Count());
-            Console.WriteLine("MeanValue " + MeanValue + " numerator " + numerator);
             return standardDeviation;
         }
     }

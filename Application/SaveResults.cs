@@ -21,7 +21,7 @@ namespace Application
                 Title = "Zapisz folder z wynikami",
                 FileName = "",
                 FilterIndex = 0,
-                InitialDirectory = "C:\\Users\\Ania\\Desktop\\bbbb"//Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)// Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop)
             };
 
             if (sfd.ShowDialog() == DialogResult.OK)

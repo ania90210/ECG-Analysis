@@ -17,19 +17,13 @@ namespace Application
         {
             string comment = "";
 
-            for (int i = 0; i < resultsECG.Count; i++) //resultsPillow
+            for (int i = 0; i < resultsECG.Count; i++) 
             {
 
                 HeartRate = resultsECG[i];
                 if (eChair)
                 {
-                   /* if (resultsPillow1[i] == 0 && resultsPillow2[i] == 0) // jezeli nikt nie siedzi
-                    {
-                        comment = "Brak ruchu";
-                        HeartRate = 0;
-                    }*/
-
-                    if (resultsPillow1[i] >= 1 && resultsPillow2[i] >= 1) // movement && resultsPillow2[i] >= 10
+                    if (resultsPillow1[i] >= 1 && resultsPillow2[i] >= 1) // jeżeli wykryto ruch pacjenta
                     {
                         if (HeartRate >= 55 && HeartRate <= 90) comment = "Wszystko OK";
                         else if (HeartRate >= 45 && HeartRate < 55) comment = "Puls za niski";
@@ -38,10 +32,8 @@ namespace Application
 
                         else if (HeartRate == 0 || (HeartRate < 45 && HeartRate > 0)) comment = "Zmiana pozycji";
                         else if (HeartRate < 0 ) { comment = "Zmiana pozycji"; HeartRate = 0; }
-                        // else if (HeartRate < 0 && HeartRate + 200 < 45) { comment = "Zmiana pozycji"; HeartRate = 0; }
-                        //else if (HeartRate < 0) { comment = "ALERT!"; HeartRate = HeartRate + 200; } //Arytmia serca
                     }
-                    else if (resultsPillow1[i] < 1 && resultsPillow2[i] < 1) // no movement
+                    else if (resultsPillow1[i] < 1 && resultsPillow2[i] < 1) // jeżeli nie wykryto ruchu
                     {
                         if (HeartRate >= 55 && HeartRate <= 90) comment = "Wszystko OK";
                         else if (HeartRate >= 45 && HeartRate < 55) comment = "Puls za niski";
@@ -60,7 +52,6 @@ namespace Application
 
                     else if (HeartRate < 0) { comment = "ALERT!"; HeartRate = HeartRate + 400; }
                 }
-
 
                 string WindowTime = " [" + i * Window + " - " + (i + 1) * Window + "s]";
                 if (HeartRate == 0 || comment == "Zmiana pozycji") result = new ListViewItem(new[] { (i + 1).ToString() + WindowTime, " ?  bpm", comment });

@@ -25,57 +25,40 @@ namespace Application
         public List<double> PanTompkinsAlgorithm(List<double> inputdata, double sampleRate, List<double> intime, int SamplesToAnalise, Chart EKGchart, 
                 int WindowLength, bool PhysioNet)
         {
-            Console.WriteLine("resultsHR COUNT:  " + resultsHR.Count());
             double[] lowFilter = new double[SamplesToAnalise + 5];            
             double[] highFilter = new double[SamplesToAnalise + 5];
             double[] indata = inputdata.ToArray();
             double[] time = intime.ToArray();
 
-            // FILTERING
+            // FILTRACJA
             BandPassFilter bf = new BandPassFilter();
             lowFilter = bf.Filter(indata, sampleRate, "LOW");              
             highFilter = bf.Filter(lowFilter, sampleRate, "HIGH");
-
-          //   chart1.ChartAreas[0].AxisX.Minimum = 0;
-           //chart1.ChartAreas[0].AxisX.Interval = 5;
-           //chart1.ChartAreas[0].AxisX.Maximum = 10;
-           //for (int i = 0; i < 45000; i++)
-           //{
-             //  chart1.Series["Pressure1"].Points.AddXY(time[i], lowFilter[i]);
-           //}
-
-            // DERIVATIVE
+       
+            // RÓŻNICZKOWANIE
             double[] derivative = new double[SamplesToAnalise];
 
             for (int i = 0; i < SamplesToAnalise - 1; i++)
             {
                 derivative[i] = (highFilter[i + 1] - highFilter[i]) / (time[i + 1] - time[i]);
             }
-            // SQUARING
+            // POTĘGOWANIE
             double[] square = new double[SamplesToAnalise + 500];
             for (int i = 0; i < SamplesToAnalise -1; i++)
             {
                 square[i] = derivative[i] * derivative[i];
             }
-            /*  PressureChart2.Titles["Title1"].Text = "SQUARE";
-              PressureChart2.ChartAreas[0].AxisX.Minimum = 0;
-              PressureChart2.ChartAreas[0].AxisX.Interval = 5;
-              PressureChart2.ChartAreas[0].AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
-              for (int i = 0; i < SamplesToAnalise; i++)
-              {
-                  PressureChart2.Series["Pressure1"].Points.AddXY(time[i], square[i]);
-              }*/
-            //MOVING AVERAGE FILTER
+           
+            //FILTRACJA UŚREDNIAJĄCA
             double[] average = new double[SamplesToAnalise + 5];
-            int movingAverageFilter = 0;
+            int movingAverageFilter = 0; // długość okna ruchomego
             if(sampleRate < 150) movingAverageFilter = 15;
-            else if (sampleRate >= 150 && sampleRate <= 300) movingAverageFilter = 40; // lub 180
+            else if (sampleRate >= 150 && sampleRate <= 300) movingAverageFilter = 40; 
             else if (sampleRate < 500 && sampleRate > 300) movingAverageFilter = 100;
             else if (sampleRate <= 1000 && sampleRate >= 500) movingAverageFilter = 200;
             else if (sampleRate < 4000 && sampleRate > 1000) movingAverageFilter = 300;
-            else if (sampleRate >= 4500) movingAverageFilter = 400; // z 300
+            else if (sampleRate >= 4500) movingAverageFilter = 400; 
             else movingAverageFilter = 500;
-            Console.WriteLine("movingAverageFilter" + movingAverageFilter);
 
             for (int j = movingAverageFilter-1; j < SamplesToAnalise + movingAverageFilter -1; j++) 
             {
@@ -90,29 +73,21 @@ namespace Application
           
 
 
-            // FIRST PEAK
-            /* int Samples = 0;
-             if (sampleRate == 100) Samples = 100;
-             else if (sampleRate == 400 || sampleRate == 360) Samples = 380;
-             else if (sampleRate == 4500) Samples = 4300;
-             else Samples = 200;*/
+            // PIERWSZE MAKSIMUM
             int Samples = (int)sampleRate;
             double[] firstSamples = new double[Samples];
             for (int i = 0; i < Samples; i++)   
             {
                 firstSamples[i] = average[i];
             }
-
+            // WARTOŚĆ GRANICZNA
             double maxValue = firstSamples.Max();
             double SPK = 0.7*maxValue;
             double NPK = 0.1 * SPK;
             double THRESHOLD = 0.25 * SPK + 0.75 * NPK;
-            //  double THRESHOLD = 0.5* maxValue;
-            Console.WriteLine("thresh: " + THRESHOLD + " maxvalue " + maxValue + " time " + Array.FindIndex(firstSamples, w => w == maxValue));
-
-            
-            // DETECTION
-            for (int i =0; i < SamplesToAnalise; i++) //int i = Array.FindIndex(firstSamples, w => w == maxValue)
+           
+            // DETEKCJA
+            for (int i =0; i < SamplesToAnalise; i++) 
             {
                 if (average[i] > THRESHOLD)
                 {
@@ -121,8 +96,8 @@ namespace Application
 
                     if (average[i + 1] < THRESHOLD)
                     {
-                        double max = AboveAverage.Max(); // R peak
-                        int index = AboveAverage.FindIndex(w => w == max); // index of R peak == index of Time of this peak
+                        double max = AboveAverage.Max(); // załamek R
+                        int index = AboveAverage.FindIndex(w => w == max); // czas w jakim wystąpił załamek R
                         RTime.Add(TimeAboveAverage[index]);
                         ListOfPeaks.Add(max);
                         AboveAverage.Clear();
@@ -131,9 +106,10 @@ namespace Application
                 }
             }
             int number = ListOfPeaks.Count;
+            // sprawdzanie odległości między wykrytymi maksimami i usuwanie tych błędnie wykrytych
             for (int i = 0; i < number - 1; i++)
             {
-                if(RTime[i+1] - RTime[i] < 0.4)//0.49
+                if(RTime[i+1] - RTime[i] < 0.4)
                 {
                     if (ListOfPeaks[i + 1] < ListOfPeaks[i])
                     {
@@ -152,77 +128,60 @@ namespace Application
                 {
                     RTimeDetected.Add(RTime[i]);
                 }
-                if (ListOfPeaks[i] != 0 && ListOfPeaks[i] > maxValue * 3) // jezeli peak R jest za duzy
+                if (ListOfPeaks[i] != 0 && ListOfPeaks[i] > maxValue * 3) // jezeli załamek R jest za wysoki
                 {
-                    Console.WriteLine("za duzy r " + ListOfPeaks[i]);
                     RtooHigh_Low.Add(RTime[i]);
                 }
-                else if (ListOfPeaks[i] != 0 && ListOfPeaks[i] < maxValue * 0.5) // jezeli peak R jest za maly 0.3
+                else if (ListOfPeaks[i] != 0 && ListOfPeaks[i] < maxValue * 0.5) // jezeli załamek R jest za niski
                 {
-                    Console.WriteLine("za male r " + ListOfPeaks[i]);
                     RtooHigh_Low.Add(RTime[i]);
                 }
             }
-            foreach (double d in RTimeDetected)
-            {
-                Console.WriteLine(" RTimeDetected " + d);
-            }
+            
             double averageRTime = 0;
             int numberRdet = RTimeDetected.Count;
 
             if (numberRdet > 4)
             {
-                for (int i = 0; i < 3; i++) // wez pierwsze 3 R
+                for (int i = 0; i < 3; i++)
                 {
                     RDistance.Add(RTimeDetected[i + 1] - RTimeDetected[i]);
                 }
-                averageRTime = RDistance.Average(); // Srednia miedzy kazdym R x3
-                Console.WriteLine(" averageRTime: " + averageRTime);
+                averageRTime = RDistance.Average(); // średnia odległość miedzy każdym załamkiem R
             }
            
-            Console.WriteLine("number rdet: " + numberRdet);
             if (numberRdet > 7)
             {               
                 for (int i = 0; i < numberRdet; i++)
                 {
-                    if (i < numberRdet - 2 && RTimeDetected[i + 2] - RTimeDetected[i] < 1) // jezeli R wystepuja za czesto
+                    if (i < numberRdet - 2 && RTimeDetected[i + 2] - RTimeDetected[i] < 1) // jezeli załamki R wystepują za często
                     {
                         double[] range = { RTimeDetected[i], RTimeDetected[i + 2] };
                         error.AddRange(range);
-                        Console.WriteLine("RTimeDetected[i]: 3xR < 1s: wystepuja za czesto " + RTimeDetected[i] + " " + RTimeDetected[i + 2]);
                     }
-                    if (i < numberRdet - 1 && RTimeDetected[i + 1] - RTimeDetected[i] > 2) // jezeli R wystepuja za rzadko
+                    if (i < numberRdet - 1 && RTimeDetected[i + 1] - RTimeDetected[i] > 2) // jezeli załamki R wystepują za rzadko
                     {
                         double[] range = { RTimeDetected[i], RTimeDetected[i + 1] };
                         error.AddRange(range);
-                        Console.WriteLine("RTimeDetected[i]: 2xR > 2s: wystepuja za rzadko " + RTimeDetected[i] + " " + RTimeDetected[i + 1]);
                     }
                 }
-                for (int i = 0; i < numberRdet; i++) // co z tym?????????????????????????????????????????????????????????????
+                // czy odległość R-R nie są za duże / małe
+                for (int i = 0; i < numberRdet; i++)
                 {
                     if (i < numberRdet - 1 && averageRTime != 0 && RTimeDetected[i + 1] - RTimeDetected[i] < 0.30 * averageRTime)
                     {
-                        Console.WriteLine("Za mala odleglosc do: " + RTimeDetected[i + 1]);
                         double[] range = { RTimeDetected[i], RTimeDetected[i + 1] };
                         error.AddRange(range);
                     }
-                    else if (i < numberRdet - 1 && averageRTime != 0 && RTimeDetected[i + 1] - RTimeDetected[i] > 1.60 * averageRTime) // bylo 1.7
+                    else if (i < numberRdet - 1 && averageRTime != 0 && RTimeDetected[i + 1] - RTimeDetected[i] > 1.60 * averageRTime)
                     {
-                        Console.WriteLine("Za duza odleglosc do: " + RTimeDetected[i + 1]);
                         double[] range = { RTimeDetected[i], RTimeDetected[i + 1] };
                         error.AddRange(range);
                     }
                 }
             }
-                foreach (double d in ListOfPeaks)
-            {
-            Console.WriteLine(" ListOfPeaks " + d);          
-            }
-            foreach (double d in RtooHigh_Low)
-            {
-                Console.WriteLine(" RtooHigh_Low " + d);
-            }           
-
+                   
+            // rysowanie punktów na wykresie EKG
             foreach (double K in ListOfPeaks)
             {
                 for (int i = 0; i < SamplesToAnalise; i++)
@@ -234,11 +193,11 @@ namespace Application
                     }
                }
             }
-            // HEART RATE
+            // obliczenie pulsu dla każdego okna
             int y = 0;
             int x = 1;
             double numberOfWindows = (SamplesToAnalise / sampleRate) / WindowLength;
-            double RoundWindow = Math.Floor(numberOfWindows);//Math.Round(numberOfWindows);
+            double RoundWindow = Math.Floor(numberOfWindows);
             for (int i = 0; i < RoundWindow; i++)
             {
                 resultsHR.Add(CalculateHeartRate(WindowLength, RTime, ListOfPeaks, x, y, error, RtooHigh_Low, PhysioNet));
@@ -256,18 +215,17 @@ namespace Application
             {
                 if (error.Count != 0 && error[i] >= y * WindowLength && error[i] < x * WindowLength)
                 {
-                    result = "noise";
+                    result = "noise"; // jeżeli odległości między załamkami R są niewłaściwe
                 }                
             }
-            for (int i = 0; i < RtooHigh_Low.Count; i++) //+2
+            for (int i = 0; i < RtooHigh_Low.Count; i++) 
             {
-                if (RtooHigh_Low.Count > 0 && result != "noise" && RtooHigh_Low[i] >= y * WindowLength && RtooHigh_Low[i] < x * WindowLength) // !=0
+                if (RtooHigh_Low.Count > 0 && result != "noise" && RtooHigh_Low[i] >= y * WindowLength && RtooHigh_Low[i] < x * WindowLength) 
                 {                    
-                    result = "irregularity";
+                    result = "irregularity"; // jeżeli występowały zmiany amplitud załamków R
                     Rerror++;
                 }
             }
-           // if (Rerror < 3 && result != "noise") { result = ""; R = R - Rerror; }
             for (int i = 0; i < RTime.Count; i++)
             {
                 if (RTime[i] >= y * WindowLength && RTime[i] <= x * WindowLength && ListOfPeaks[i] != 0)
@@ -275,10 +233,9 @@ namespace Application
                     R++;
                 }
             }
-           // if (RtooHigh_Low.Count < 3 && result != "noise") { result = ""; R = R - RtooHigh_Low.Count;  }
+
             double perMinute = 60 / WindowLength;
             HeartRate = R * perMinute;
-            Console.WriteLine("Physionet : " + PhysioNet);
             if (PhysioNet)
             {
                 if (result == "noise" || result == "irregularity") HeartRate = HeartRate - 400; ;
@@ -287,8 +244,7 @@ namespace Application
             {
                 if (result == "noise") HeartRate = 0;
                 else if (result == "irregularity") HeartRate = HeartRate - 400;
-            }           
-            
+            }                      
             return HeartRate;
         }
     }

@@ -22,16 +22,15 @@ namespace Application
                 lines[i] = lines[i].Replace('.', ',');
                 column = lines[i].Split(' ', '\t');
 
-               if(eChair) amplitude.Add(Double.Parse(column[0]));
-               else if(PhysioNet) amplitude.Add(Double.Parse(column[1]));
+               if(eChair) amplitude.Add(Double.Parse(column[0])); // weź pierwszą kolumnę z wartościami
+               else if(PhysioNet) amplitude.Add(Double.Parse(column[1])); // weź drugą kolumnę z wartościami
 
                if (i!=SamplesToAnalise-1) time.Add(i * Ts);
                else time.Add(Math.Round(time[SamplesToAnalise - 2]));
 
             }
-            Console.WriteLine(" Math.Round(time[SamplesToAnalise - 1]); " + Math.Round(time[SamplesToAnalise - 1]));
 
-            // EKG chart
+            // wykres EKG
             var chart = EKGchart.ChartAreas[0];
             chart.AxisX.Minimum = 0;
             chart.AxisX.Maximum = Math.Round(time[SamplesToAnalise - 1]);
@@ -54,7 +53,7 @@ namespace Application
 
             if (eChair)
             {
-                // PILLOW I
+                // Poduszka I
                 for (int i = 0; i < PressureSamples; i++)
                 {
                     lines[i] = lines[i].Replace('.', ',');
@@ -88,8 +87,7 @@ namespace Application
                     }
                 }
 
-                //PILLOW II
-                //nowe Z KOLUMNAMI
+                //Poduszka II
                 for (int i = 0; i < PressureSamples; i++)
                 {
                     lines[i] = lines[i].Replace('.', ',');
@@ -125,7 +123,7 @@ namespace Application
                 }
             }
         }
-
+        // metoda rysująca podziałki
         public void VerticalLine(Chart chart, int x, List<double> time)
         {
             VerticalLineAnnotation VA = new VerticalLineAnnotation();

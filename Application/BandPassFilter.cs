@@ -11,11 +11,10 @@ namespace Application
         public double[] Filter(double[] indata, double sampleRate, string filter)
         {
             double[] error = { };
-            long dF2 = indata.Length - 1;        // The data range is set with dF2
-            double[] Dat2 = new double[dF2 + 4]; // Array with 4 extra points front and back // INPUT
-                                                 // double[] data = indata; // Ptr., changes passed data
+            long dF2 = indata.Length - 1;        
+            double[] Dat2 = new double[dF2 + 4]; 
+                                                 
             double[] data = new double[indata.Length];
-            // Copy indata to Dat2
             for (long r = 0; r < dF2; r++)
             {
                 Dat2[2 + r] = indata[r];
@@ -23,14 +22,14 @@ namespace Application
             Dat2[1] = Dat2[0] = indata[0];
             Dat2[dF2 + 3] = Dat2[dF2 + 2] = indata[dF2];
 
-            // RECURSIVE TRIGGERS - ENABLE filter is performed (first, last points constant)
+            // przygotowanie do rekursji
             double[] DatYt = new double[dF2 + 4]; //OUTPUT
             DatYt[1] = DatYt[0] = indata[0];
 
             double[] DatH = new double[dF2 + 4]; //OUTPUT
             DatH[1] = DatH[0] = indata[0];
 
-            // LOW FILTER
+            // filtr dolnoprzepustowy
             if (filter == "LOW")
             {
                 double cN = 1 / Math.Tan(Math.PI * 15 / sampleRate);
@@ -54,7 +53,7 @@ namespace Application
             }
 
 
-            //HIGH FILTER 
+            //filtr górnoprzepustowy
             if (filter == "HIGH")
             {
                 double cNH = Math.Tan(Math.PI * 5 / sampleRate);
